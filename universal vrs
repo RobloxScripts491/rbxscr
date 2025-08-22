@@ -1,0 +1,380 @@
+local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAAAA%20TLIB"))()
+
+local window = library:Window("Game: " .. gameName)
+
+-- Global variables
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local TweenService = game:GetService("TweenService")
+local InfiniteJumpEnabled = false
+local AutoWinEnabled = false
+local hiddenfling = false
+local flying = false
+local flySpeed = 50 -- Default fly speed
+local bodyVelocity, bodyGyro
+local character = plr.Character or plr.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Walkspeed and Jump Power enforcement function
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Handle character respawn
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+    -- Update character, humanoid, and rootPart for fly functionality
+    character = character
+    humanoid = character:WaitForChild("Humanoid")
+    rootPart = character:WaitForChild("HumanoidRootPart")
+    if flying then
+        disableFly()
+    end
+end)
+
+-- Current character enforcement
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Fly functionality
+local function enableFly()
+    if flying then return end
+    flying = true
+    humanoid.PlatformStand = true
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Parent = rootPart
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.P = 10000
+    bodyGyro.D = 500
+    bodyGyro.CFrame = rootPart.CFrame
+    bodyGyro.Parent = rootPart
+    spawn(function()
+        while flying and bodyVelocity and bodyGyro do
+            local camera = workspace.CurrentCamera
+            local direction = Vector3.new(0, 0, 0)
+            if userInputService:IsKeyDown(Enum.KeyCode.W) then
+                direction = direction + camera.CFrame.LookVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.S) then
+                direction = direction - camera.CFrame.LookVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.A) then
+                direction = direction - camera.CFrame.RightVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.D) then
+                direction = direction + camera.CFrame.RightVector
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.Space) then
+                direction = direction + Vector3.new(0, 1, 0)
+            end
+            if userInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                direction = direction + Vector3.new(0, -1, 0)
+            end
+            if direction.Magnitude > 0 then
+                direction = direction.Unit * flySpeed
+            end
+            if bodyVelocity then
+                bodyVelocity.Velocity = direction
+            end
+            if bodyGyro then
+                bodyGyro.CFrame = CFrame.new(rootPart.Position, rootPart.Position + camera.CFrame.LookVector)
+            end
+            wait()
+        end
+    end)
+end
+
+local function disableFly()
+    if not flying then return end
+    flying = false
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
+    end
+    if bodyGyro then
+        bodyGyro:Destroy()
+        bodyGyro = nil
+    end
+    humanoid.PlatformStand = false
+end
+
+-- Touch Fling function
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local function fling()
+    local lp = Players.LocalPlayer
+    local c, hrp, vel, movel = nil, nil, nil, 0.1
+    while hiddenfling do
+        RunService.Heartbeat:Wait()
+        c = lp.Character
+        hrp = c and c:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            vel = hrp.Velocity
+            hrp.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            RunService.RenderStepped:Wait()
+            hrp.Velocity = vel
+            RunService.Stepped:Wait()
+            hrp.Velocity = vel + Vector3.new(0, movel, 0)
+            movel = -movel
+        end
+    end
+end
+
+-- Touch Fling detection Decal
+if not ReplicatedStorage:FindFirstChild("juisdfj0i32i0eidsuf0iok") then
+    local detection = Instance.new("Decal")
+    detection.Name = "juisdfj0i32i0eidsuf0iok"
+    detection.Parent = ReplicatedStorage
+end
+
+window:Button("Anti AFK", function()
+    local VirtualUser = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:Button2Down(Vector2.new(0, 0))
+        wait(0.1)
+        VirtualUser:Button2Up(Vector2.new(0, 0))
+    end)
+
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "AntiAFK Activated!",
+        Text = "AntiAFK Successfully Loaded!",
+        Duration = 5
+    })
+end)
+
+-- Touch Fling Toggle
+window:Toggle("Touch Fling", false, function(bool)
+    hiddenfling = bool
+    print("Touch Fling: " .. tostring(bool))
+    if bool then
+        local flingThread = coroutine.create(fling)
+        coroutine.resume(flingThread)
+    end
+end)
+
+-- Noclip Toggle
+window:Toggle("Noclip", false, function(bool)
+    print("Noclip: " .. tostring(bool))
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    if bool then
+        if _G.noclipConnection then
+            _G.noclipConnection:Disconnect()
+        end
+        local function enableNoclip()
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+        _G.noclipConnection = game:GetService("RunService").Stepped:Connect(enableNoclip)
+        player.CharacterAdded:Connect(function(newCharacter)
+            character = newCharacter
+            enableNoclip()
+        end)
+        enableNoclip()
+    else
+        if _G.noclipConnection then
+            _G.noclipConnection:Disconnect()
+            _G.noclipConnection = nil
+        end
+        local function disableNoclip()
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+        disableNoclip()
+        player.CharacterAdded:Connect(function(newCharacter)
+            character = newCharacter
+            disableNoclip()
+        end)
+    end
+end)
+
+-- Infinite Jump Toggle
+window:Toggle("Inf Jump", false, function(bool)
+    InfiniteJumpEnabled = bool
+    print("Inf Jump: " .. tostring(bool))
+end)
+
+-- Fly Toggle
+window:Toggle("Fly", false, function(bool)
+    print("Fly: " .. tostring(bool))
+    if bool then
+        enableFly()
+    else
+        disableFly()
+    end
+end)
+
+-- Fly Speed Slider
+window:Slider("Fly Speed", 0, 1000, 50, function(value)
+    flySpeed = value
+    print("Fly Speed set to: " .. value)
+end)
+
+-- Walkspeed Box
+window:Box("Walkspeed", function(text, focuslost)
+    if focuslost then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a walkspeed value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        local speed = tonumber(text)
+        if not speed then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid walkspeed! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        desiredWalkspeed = speed
+        humanoid.WalkSpeed = speed
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Walkspeed set to " .. speed,
+            Button1 = "Ok",
+            Duration = 5
+        })
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Jump Power Box
+window:Box("Jump Power", function(text, focuslost)
+    if focuslost then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a jump power value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        local power = tonumber(text)
+        if not power then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid jump power! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        desiredJumpPower = power
+        humanoid.JumpPower = power
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success!",
+            Text = "Jump Power Set",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Dropdown for Links
+local dropdown = window:Dropdown("Links", {"Youtube Channel"}, function(name)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+-- Destroy UI Button
+window:Button("Destroy UI", function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            window:Destroy()
+        elseif answer == "No" then
+        end
+    end
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Make Sure To Closed All Toggles!",
+        Duration = 999,
+        Button1 = "Yes",
+        Button2 = "No",
+        Callback = BindableFunction
+    })
+end)
+
+library:Keybind("P")
+window:Label("Created by Baris", true)
+window:Label("Press P to hide GUI.", true)

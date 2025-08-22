@@ -1,0 +1,217 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAAAA%20TLIB"))()
+
+local window = library:Window("Car Crash Test Script")
+
+-- Global değişkenler
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+
+-- Walkspeed ve Jump Power'ı zorla ayarlama fonksiyonu
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Karakter yenilendiğinde değerleri koru
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Mevcut karakter için değerleri koru
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump (UserInputService ile modernize edildi)
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Infinite Jump Toggle
+window:Toggle("Inf Jump", false, function(bool)
+    InfiniteJumpEnabled = bool
+    print("Inf Jump: " .. tostring(bool))
+end)
+
+-- Walkspeed Box
+window:Box("Walkspeed", function(text, focuslost)
+    if focuslost then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a walkspeed value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        
+        local speed = tonumber(text)
+        if not speed then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid walkspeed! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        
+        desiredWalkspeed = speed
+        humanoid.WalkSpeed = speed
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Walkspeed set to " .. speed,
+            Button1 = "Ok",
+            Duration = 5
+        })
+        
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Jump Power Box
+window:Box("Jump Power", function(text, focuslost)
+    if focuslost then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "NOTE!",
+            Text = "Jump Power set",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a jump power value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        
+        local power = tonumber(text)
+        if not power then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid jump power! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        
+        desiredJumpPower = power
+        humanoid.JumpPower = power
+        
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Dropdown for Links
+local dropdown = window:Dropdown("Links", {"Youtube Channel"}, function(name)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+-- Spawn Car Dropdown
+local carOptions = {}
+for i = 1, 66 do
+    table.insert(carOptions, "Car " .. i)
+end
+
+window:Dropdown("Spawn Car", carOptions, function(name)
+    local carNumber = string.match(name, "%d+")
+    local args = {
+        [1] = "carcrash" .. carNumber
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("SpawnCar"):FireServer(unpack(args))
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Car " .. carNumber .. " Spawned!",
+        Button1 = "Ok",
+        Duration = 5
+    })
+end)
+
+-- Destroy UI Button
+window:Button("Destroy UI", function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            window:Destroy()
+        elseif answer == "No" then
+        end
+    end
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Confirm to close UI!",
+        Duration = 999,
+        Button1 = "Yes",
+        Button2 = "No",
+        Callback = BindableFunction
+    })
+end)
+
+library:Keybind("P")
+window:Label("Created by Baris", true)
+window:Label("Press P to hide GUI.", true)

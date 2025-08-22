@@ -1,0 +1,322 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAAAA%20TLIB"))()
+
+local window = library:Window("Merge for DIAMONDS!")
+
+-- Variable to track toggle states
+local infGems = false
+local infCash = false
+local spinnyTickets = false
+local potionSpam = false
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+
+-- Function to enforce Walkspeed and JumpPower values
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait()
+    end
+end
+
+-- Handle character respawn to maintain Walkspeed and JumpPower
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Apply to current character
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+window:Button("Upgrade All To Max", function()
+local blockArgs = { 'MaxBlocksLevel', 21, 5400 }
+game:GetService('ReplicatedStorage').Remotes.UpgradeEvent:FireServer(unpack(blockArgs))
+wait("0.1")
+local multiplierArgs = { 'CashMultiplier', 100 }
+game:GetService('ReplicatedStorage').Remotes.MultiplierEvent:FireServer(unpack(multiplierArgs))
+wait("0.1")
+local spawnRateArgs = { 'SpawnRateLevel', 30, 300 }
+game:GetService('ReplicatedStorage').Remotes.UpgradeEvent:FireServer(unpack(spawnRateArgs))
+wait("0.1")
+local spawnTierArgs = { 'SpawnTierLevel', 80, 2000 }
+game:GetService('ReplicatedStorage').Remotes.UpgradeEvent:FireServer(unpack(spawnTierArgs))
+wait("0.1")
+local autoMergeArgs = { 'AutoMergeLevel', 18, 160000000 }
+game:GetService('ReplicatedStorage').Remotes.UpgradeEvent:FireServer(unpack(autoMergeArgs))
+wait("0.1")
+local luckyMergeArgs = { 'LuckyMergeLevel', 999999, 15000 }
+game:GetService('ReplicatedStorage').Remotes.UpgradeEvent:FireServer(unpack(luckyMergeArgs))
+end)
+
+-- Infinite Jump
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- VIP Tag Toggle
+window:Toggle("VIP Tag", false, function(state)
+    game:GetService("Players").LocalPlayer.HasVIP.Value = state
+end)
+
+-- INF Gems Toggle
+window:Toggle("INF Gems", false, function(state)
+    infGems = state
+    task.spawn(function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local GemEvent = ReplicatedStorage.Remotes.GemEvent
+        while infGems do
+            GemEvent:FireServer(99999999999999999999999999999999999999)
+            task.wait()
+        end
+    end)
+end)
+
+-- Get INF Cash Toggle
+window:Toggle("Get INF Cash", false, function(state)
+    infCash = state
+    task.spawn(function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local AddValueEvent = ReplicatedStorage.Remotes.AddValueEvent
+        while infCash do
+            AddValueEvent:FireServer("Cash", 99999999999999999999999999999999999999)
+            task.wait()
+        end
+    end)
+end)
+
+-- Inf Wheel Toggle
+window:Toggle("Inf Wheel", false, function(state)
+    spinnyTickets = state
+    task.spawn(function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local NextTierEvent = ReplicatedStorage.Remotes.NextTierEvent
+        while spinnyTickets do
+            NextTierEvent:FireServer("15")
+            task.wait()
+        end
+    end)
+end)
+
+-- Get x2 Block Potion Toggle
+window:Toggle("Get x2 Block Potion", false, function(state)
+    potionSpam = state
+    task.spawn(function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local NextTierEvent = ReplicatedStorage.Remotes.NextTierEvent
+        while potionSpam do
+            NextTierEvent:FireServer("6")
+            task.wait()
+        end
+    end)
+end)
+
+-- Infinite Jump Toggle
+window:Toggle("Inf Jump", false, function(bool)
+    InfiniteJumpEnabled = bool
+    print("Inf Jump: " .. tostring(bool))
+end)
+
+-- Spawn Block Box
+window:Box("Spawn Block", function(text, focuslost)
+    if focuslost then
+        local blockArgs = { 'Blocks', tonumber(text) }
+        if not blockArgs[2] then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid block value! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        game:GetService('ReplicatedStorage').Remotes.AddRewardEvent:FireServer(unpack(blockArgs))
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Spawned " .. text .. " blocks!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+    end
+end)
+
+-- Get Spin Box
+window:Box("Get Spin", function(text, focuslost)
+    if focuslost then
+        local spinArgs = { 'Spins', tonumber(text) }
+        if not spinArgs[2] then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid spin value! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        game:GetService('ReplicatedStorage').Remotes.AddRewardEvent:FireServer(unpack(spinArgs))
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Sent " .. text .. " spins!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+    end
+end)
+
+-- Walkspeed Box
+window:Box("Walkspeed", function(text, focuslost)
+    if focuslost then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a walkspeed value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        
+        local speed = tonumber(text)
+        if not speed then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid walkspeed! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil
+            return
+        end
+        
+        desiredWalkspeed = speed
+        humanoid.WalkSpeed = speed
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Walkspeed set to " .. speed,
+            Button1 = "Ok",
+            Duration = 5
+        })
+        
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Jump Power Box
+window:Box("Jump Power", function(text, focuslost)
+    if focuslost then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "NOTE!",
+            Text = "If it doesnt work open Inf Jump",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a jump power value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        
+        local power = tonumber(text)
+        if not power then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid jump power! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil
+            return
+        end
+        
+        desiredJumpPower = power
+        humanoid.JumpPower = power
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Destroy UI Button
+window:Button("Destroy UI", function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            window:Destroy()
+        end
+    end
+
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Make Sure To Closed All Toggles!",
+        Duration = 999,
+        Button1 = "Yes",
+        Button2 = "No",
+        Callback = BindableFunction
+    })
+end)
+
+-- Links Dropdown
+window:Dropdown("Links", {"Youtube Channel"}, function(name)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+library:Keybind("P")
+window:Label("Created by Baris", true)
+window:Label("Press P to hide GUI.", true)

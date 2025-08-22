@@ -1,0 +1,202 @@
+-- Load the Gerad's UI library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAA%20Gerad%20Lib"))()
+
+-- Global variables
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+local AutoWinEnabled = false
+local currentToggleKey = "RightShift" -- Default key for toggling UI
+
+-- Walkspeed and Jump Power enforcement function
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait() -- Check every frame
+    end
+end
+
+-- Handle character respawn
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Apply to current character
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump using UserInputService
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Create a window
+local Window = Library:CreateWindow('Script')
+
+-- Create a section
+local Section = Window:Section('Controls')
+
+-- Auto Win Toggle
+Section:Toggle('Auto Win', {flag = 'AutoWin'}, function(value)
+    _G.GetWins = value
+    AutoWinEnabled = value
+    print("Auto Win: " .. tostring(value))
+    while _G.GetWins do
+        wait()
+        local args = {
+            "\230\142\137\232\144\189\231\137\169Center",
+            "247"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+    end
+end)
+
+-- Infinite Jump Toggle
+Section:Toggle('Inf Jump', {flag = 'InfJump'}, function(value)
+    InfiniteJumpEnabled = value
+    print("Inf Jump: " .. tostring(value))
+end)
+
+-- Walkspeed Slider
+Section:Slider('Walkspeed', {flag = 'Walkspeed', Min = 16, Max = 100, Default = 16, Precise = false}, function(value)
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Character or Humanoid not found!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        return
+    end
+    
+    if value == 0 then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Walkspeed cannot be 0!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        desiredWalkspeed = nil
+        return
+    end
+    
+    desiredWalkspeed = value
+    humanoid.WalkSpeed = value
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Walkspeed set to " .. value,
+        Button1 = "Ok",
+        Duration = 5
+    })
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end)
+
+-- Jump Power Slider
+Section:Slider('Jump Power', {flag = 'JumpPower', Min = 50, Max = 200, Default = 50, Precise = false}, function(value)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "NOTE!",
+        Text = "If it doesn't work, enable Inf Jump",
+        Button1 = "Ok",
+        Duration = 5
+    })
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Character or Humanoid not found!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        return
+    end
+    
+    if value == 0 then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Jump Power cannot be 0!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        desiredJumpPower = nil
+        return
+    end
+    
+    desiredJumpPower = value
+    humanoid.JumpPower = value
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end)
+
+-- Links Dropdown
+Section:Dropdown('Links', {flag = 'Links', list = {'Youtube Channel'}, Type = 'Toggle'}, function(option)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+-- Destroy UI Button
+Section:Button('Destroy UI', function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+    
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            Library:Destroy()
+        end
+    end
+    
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Make Sure To Close All Toggles!",
+        Duration = 999,
+        Button1 = "Yes",
+        Button2 = "No",
+        Callback = BindableFunction
+    })
+end)
+
+-- Labels
+Section:Label('Created by Baris')
+Section:Label('Press ' .. currentToggleKey .. ' to toggle UI')
+
+-- Keybind to set Toggle UI key
+
+
+-- Keybind to toggle UI (handled via InputBegan for custom key)
+userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent and input.KeyCode == Enum.KeyCode[currentToggleKey] then
+        Library:Toggle() -- Toggle the UI
+    end
+end)

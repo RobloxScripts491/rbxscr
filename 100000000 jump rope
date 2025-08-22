@@ -1,0 +1,388 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAAAA%20TLIB"))()
+
+local window = library:Window("Script")
+
+-- Global değişkenler
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+
+-- Walkspeed ve Jump Power'ı zorla ayarlama fonksiyonu
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait() -- Her frame'de kontrol (daha hızlı tepki)
+    end
+end
+
+-- Karakter yenilendiğinde değerleri koru
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Mevcut karakter için değerleri koru
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump (UserInputService ile modernize edildi)
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+
+
+
+-- GODMODE-FRONTMAN Toggle
+window:Toggle("GODMODE-FRONTMAN", false, function(bool)
+    local args = {
+        [1] = bool and "ON" or "OFF"
+    }
+    game:GetService("ReplicatedStorage").Frontman_Remotes.morph:FireServer(unpack(args))
+end)
+
+-- STOP ROPE Toggle
+window:Toggle("STOP ROPE(laggy)", false, function(bool)
+    if bool then
+        -- Run green every 0.1 seconds when true
+        spawn(function()
+            while bool do
+                game:GetService("ReplicatedStorage").Frontman_Remotes.green:FireServer()
+                wait(0.1)
+            end
+        end)
+    else
+        -- Run red when false
+        game:GetService("ReplicatedStorage").Frontman_Remotes.red:FireServer()
+    end
+end)
+
+-- Infinite Jump Toggle
+window:Toggle("Inf Jump", false, function(bool)
+    InfiniteJumpEnabled = bool
+    print("Inf Jump: " .. tostring(bool))
+end)
+
+-- Cash Giver Box
+window:Box("Cash Giver", function(text, focuslost)
+    if focuslost then
+        local amount = tonumber(text)
+        if not amount then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a valid number!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        local args = {
+            [1] = tostring(amount)
+        }
+        game:GetService("ReplicatedStorage").CratesUtilities.Remotes.GiveReward:FireServer(unpack(args))
+        
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Giving " .. amount .. " cash",
+            Button1 = "Ok",
+            Duration = 5
+        })
+    end
+end)
+
+-- Cash Remover Box
+window:Box("Cash Remover", function(text, focuslost)
+    if focuslost then
+        local amount = tonumber(text)
+        if not amount then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a valid number!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        local args = {
+            [1] = amount
+        }
+        game:GetService("ReplicatedStorage").CratesUtilities.Remotes.RemoveMoney:FireServer(unpack(args))
+        
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Removing " .. amount .. " cash",
+            Button1 = "Ok",
+            Duration = 5
+        })
+    end
+end)
+
+-- Walkspeed Box
+window:Box("Walkspeed", function(text, focuslost)
+    if focuslost then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a walkspeed value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil -- Boş girişte izlemeyi durdur
+            return
+        end
+        
+        local speed = tonumber(text)
+        if not speed then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid walkspeed! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredWalkspeed = nil -- Geçersiz girişte izlemeyi durdur
+            return
+        end
+        
+        desiredWalkspeed = speed
+        humanoid.WalkSpeed = speed
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Success",
+            Text = "Walkspeed set to " .. speed,
+            Button1 = "Ok",
+            Duration = 5
+        })
+        
+        -- Değerleri koru
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Jump Power Box
+window:Box("Jump Power", function(text, focuslost)
+    if focuslost then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "NOTE!",
+            Text = "If it doesnt work open Inf Jump",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        
+        if not humanoid then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Character or Humanoid not found!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            return
+        end
+        
+        if text == "" then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Please enter a jump power value!",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil -- Boş girişte izlemeyi durdur
+            return
+        end
+        
+        local power = tonumber(text)
+        if not power then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Error",
+                Text = "Invalid jump power! Enter a number.",
+                Button1 = "Ok",
+                Duration = 5
+            })
+            desiredJumpPower = nil -- Geçersiz girişte izlemeyi durdur
+            return
+        end
+        
+        desiredJumpPower = power
+        humanoid.JumpPower = power
+        
+        -- Değerleri koru
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+window:Button("GET LUNAR CARPET", function()
+            local args = {
+        [1] = "Space"
+    }
+
+    game:GetService("ReplicatedStorage").CratesUtilities.Remotes.GiveReward:FireServer(unpack(args))
+
+end)
+
+window:Button("GET LASERGUN", function()
+            local args = {
+        [1] = "Gun"
+    }
+
+    game:GetService("ReplicatedStorage").CratesUtilities.Remotes.GiveReward:FireServer(unpack(args))
+
+end)
+
+window:Button("Get Frontman Free", function()
+        local args = {
+        [1] = 0,
+        [2] = "Frontman"
+    }
+
+    game:GetService("ReplicatedStorage").Gamepasses_Remotes.PurchaseShop:FireServer(unpack(args))
+end)
+
+window:Button("Get Admin Free", function()
+        local args = {
+        [1] = 0,
+        [2] = "Admin"
+    }
+
+    game:GetService("ReplicatedStorage").Gamepasses_Remotes.PurchaseShop:FireServer(unpack(args))
+end)
+
+local dropdown = window:Dropdown("Free Powercoil Giver", {"FIRE","GOLD","VOID","SUPER"}, function(name)
+    local coilMap = {
+        ["FIRE"] = "FireCoil",
+        ["GOLD"] = "GoldCoil",
+        ["VOID"] = "VoidCoil",
+        ["SUPER"] = "SuperCoil"
+    }
+    
+    local args = {
+        [1] = 0,
+        [2] = coilMap[name]
+    }
+    
+    game:GetService("ReplicatedStorage").Gamepasses_Remotes.PurchaseShop:FireServer(unpack(args))
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Giving " .. name .. " Powercoil",
+        Button1 = "Ok",
+        Duration = 5
+    })
+end)
+
+local dropdown = window:Dropdown("Free Fly Carpet Giver", {"GOLD","DIAMOND","DRAGON","ADMIN FLY"}, function(name)
+    local carpetMap = {
+        ["GOLD"] = "GoldenCarpet",
+        ["DIAMOND"] = "DiamondCarpet",
+        ["DRAGON"] = "DragonCarpet",
+        ["ADMIN FLY"] = "AdminFlyCarpet"
+    }
+    
+    local args = {
+        [1] = 0,
+        [2] = carpetMap[name]
+    }
+    
+    game:GetService("ReplicatedStorage").Gamepasses_Remotes.PurchaseShop:FireServer(unpack(args))
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Giving " .. name .. " Fly Carpet",
+        Button1 = "Ok",
+        Duration = 5
+    })
+end)
+
+local dropdown = window:Dropdown("Free Slap Giver", {"GOLD","RAINBOW","OVERKILL"}, function(name)
+    local gloveMap = {
+        ["GOLD"] = "GoldenGlove",
+        ["RAINBOW"] = "RainbowGlove",
+        ["OVERKILL"] = "Overkill"
+    }
+    
+    local args = {
+        [1] = 0,
+        [2] = gloveMap[name]
+    }
+    
+    game:GetService("ReplicatedStorage").Gamepasses_Remotes.PurchaseShop:FireServer(unpack(args))
+    
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Giving " .. name .. " Slap Glove",
+        Button1 = "Ok",
+        Duration = 5
+    })
+end)
+
+local dropdown = window:Dropdown("Links", {"Youtube Channel"}, function(name)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+-- Name of button, callback
+window:Button("Destroy UI", function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+
+    -- Buton tıklamalarını işleyen fonksiyon
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            window:Destroy()
+        elseif answer == "No" then
+            -- Do nothing
+        end
+    end
+
+    -- Bildirimi gönder
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Make Sure To Closed All Toggles!",
+        Duration = 999, -- Bildirim süresi (saniye)
+        Button1 = "Yes", -- İlk butonun adı
+        Button2 = "No", -- İkinci butonun adı
+        Callback = BindableFunction -- Tıklama olaylarını bağla
+    })
+end)
+
+library:Keybind("P")
+window:Label("Created by Baris", true)
+window:Label("Press P to hide GUI.", true)

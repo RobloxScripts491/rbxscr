@@ -1,0 +1,112 @@
+-- Kütüphaneleri yükle
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAAAA%20TLIB"))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua'))()
+local InterfaceManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua'))()
+
+-- Hile menüsü penceresini oluştur
+local window = library:Window("Script")
+
+-- Sınırsız Para Butonu
+window:Button("Infinite Money", function()
+    local args = { "Cash", math.huge }
+    game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild('AddValueEvent'):FireServer(unpack(args))
+end)
+
+-- Sınırsız Mücevher Butonu
+window:Button("Infinite Gems", function()
+    local args = { math.huge }
+    game:GetService('ReplicatedStorage'):WaitForChild('Remotes'):WaitForChild("GemEvent"):FireServer(unpack(args))
+end)
+
+-- Sınırsız Para Çarpanı Butonu
+window:Button("Infinite Cash Multiplier", function()
+    local args = { 'CashMultiplier', math.huge }
+    game:GetService("ReplicatedStorage"):WaitForChild('Remotes'):WaitForChild("MultiplierEvent"):FireServer(unpack(args))
+end)
+
+-- Araba Spawn Etme Butonu
+window:Button("Spawn Cars", function()
+    local args = { 1 }
+    game:GetService("ReplicatedStorage"):WaitForChild('Remotes'):WaitForChild('SpinWheelPrizeEvent'):FireServer(unpack(args))
+end)
+
+-- Maksimum Seviyeler Butonu
+window:Button("Max All Levels", function()
+    -- Maksimum Spawn Seviyesi
+    local spawnTierArgs = { "SpawnTierLevel", 95, 125 }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("UpgradeEvent"):FireServer(unpack(spawnTierArgs))
+    
+    -- Maksimum Blok Seviyesi
+    local maxBlocksArgs = { "MaxBlocksLevel", 21, 600 }
+    game:GetService("ReplicatedStorage"):WaitForChild('Remotes'):WaitForChild("UpgradeEvent"):FireServer(unpack(maxBlocksArgs))
+    
+    -- Maksimum Spawn Hızı
+    local spawnRateArgs = { "SpawnRateLevel", 30, 300 }
+    game:GetService("ReplicatedStorage"):WaitForChild('Remotes'):WaitForChild("UpgradeEvent"):FireServer(unpack(spawnRateArgs))
+    
+    -- Maksimum Otomatik Birleştirme Seviyesi
+    local autoMergeArgs = { "AutoMergeLevel", 21, 25600000000 }
+    game:GetService("ReplicatedStorage"):WaitForChild('Remotes'):WaitForChild("UpgradeEvent"):FireServer(unpack(autoMergeArgs))
+end)
+
+-- Get 1 Rebirth Butonu
+window:Button("Get 1 Rebirth", function()
+    local args = { 1, 0, 1000000000000000000000000 }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RebirthConfirmEvent"):FireServer(unpack(args))
+end)
+
+-- Get Infinite Rebirths Toggle
+window:Toggle("Get Inf Rebirths", false, function(state)
+    _G.InfRebirths = state
+    if state then
+        while _G.InfRebirths do
+            local args = { 1, 0, 1000000000000000000000000 }
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RebirthConfirmEvent"):FireServer(unpack(args))
+            wait()
+        end
+    end
+end)
+
+-- Dropdown for Links
+local dropdown = window:Dropdown("Links", {"Youtube Channel"}, function(name)
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+-- Destroy UI Button
+window:Button("Destroy UI", function()
+    local StarterGui = game:GetService("StarterGui")
+    local BindableFunction = Instance.new("BindableFunction")
+
+    -- Buton tıklamalarını işleyen fonksiyon
+    function BindableFunction.OnInvoke(answer)
+        if answer == "Yes" then
+            window:Destroy()
+        elseif answer == "No" then
+            -- Hiçbir şey yapma
+        end
+    end
+
+    -- Bildirimi gönder
+    StarterGui:SetCore("SendNotification", {
+        Title = "Are You Sure To Exit?",
+        Text = "Make Sure To Closed All Toggles!",
+        Duration = 999,
+        Button1 = "Yes",
+        Button2 = "No",
+        Callback = BindableFunction
+    })
+end)
+
+
+
+-- Keybind ve etiketler
+library:Keybind("P")
+window:Label("Created by Baris", true)
+window:Label("Press P to hide GUI.", true)

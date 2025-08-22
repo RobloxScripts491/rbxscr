@@ -1,0 +1,253 @@
+local placeId = game.PlaceId
+
+if placeId == 7720943627 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/Car%20Crash%20Test%20Script"))()
+elseif placeId == 8200787440 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/Eat%20Blobs%20Simulator"))()
+elseif placeId == 132821440336521 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/Merge%20For%20DIAMONDS%20Script"))()
+elseif placeId == 86688009497733 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/loader"))()
+elseif placeId == 118611268319028 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/merge%20for%20speed"))()
+elseif placeId == 105492766146737 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/Bubble%20gum%20Jump"))()
+else
+    -- Creating the main GUI frame
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "RobloxExecutorGUI"
+    gui.ResetOnSpawn = false
+    gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Main frame with soft background and rounded corners, reduced height
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 280, 0, 540) -- Adjusted size to accommodate new button
+    frame.Position = UDim2.new(0.5, -140, 0.5, -270)
+    frame.BackgroundColor3 = Color3.fromRGB(220, 220, 230)
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    -- Adding subtle gradient effect
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(230, 230, 250)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 200, 220))
+    }
+    gradient.Rotation = 45
+    gradient.Parent = frame
+
+    -- Adding corner rounding
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = frame
+
+    -- Title label for "Game Unsupported!"
+    local title1 = Instance.new("TextLabel")
+    title1.Size = UDim2.new(1, 0, 0, 25)
+    title1.Position = UDim2.new(0, 0, 0, 10)
+    title1.BackgroundTransparency = 1
+    title1.Text = "Game Unsupported!"
+    title1.TextColor3 = Color3.fromRGB(70, 130, 180)
+    title1.TextSize = 24
+    title1.Font = Enum.Font.SourceSansBold
+    title1.TextStrokeTransparency = 0.8
+    title1.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    title1.Parent = frame
+
+    -- Title label for "Supported Games"
+    local title2 = Instance.new("TextLabel")
+    title2.Size = UDim2.new(1, 0, 0, 25)
+    title2.Position = UDim2.new(0, 0, 0, 35)
+    title2.BackgroundTransparency = 1
+    title2.Text = "Supported Games:"
+    title2.TextColor3 = Color3.fromRGB(70, 130, 180)
+    title2.TextSize = 24
+    title2.Font = Enum.Font.SourceSansBold
+    title2.TextStrokeTransparency = 0.8
+    title2.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    title2.Parent = frame
+
+    -- Function to create a button with soft colors
+    local function createButton(name, link, yOffset, bgColor, textColor, gradientColors, action)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(0.9, 0, 0, 50)
+        button.Position = UDim2.new(0.05, 0, 0, yOffset)
+        button.BackgroundColor3 = bgColor
+        button.Text = name
+        button.TextColor3 = textColor
+        button.TextSize = 18
+        button.Font = Enum.Font.SourceSans
+        button.Parent = frame
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 10)
+        btnCorner.Parent = button
+
+        local btnGradient = Instance.new("UIGradient")
+        btnGradient.Color = ColorSequence.new(gradientColors)
+        btnGradient.Parent = button
+
+        -- Hover effect
+        button.MouseEnter:Connect(function()
+            button.BackgroundColor3 = Color3.fromRGB(
+                math.min(bgColor.R * 255 + 15, 255),
+                math.min(bgColor.G * 255 + 15, 255),
+                math.min(bgColor.B * 255 + 15, 255)
+            )
+        end)
+        button.MouseLeave:Connect(function()
+            button.BackgroundColor3 = bgColor
+        end)
+
+        -- Button click action
+        button.MouseButton1Click:Connect(function()
+            if action == "execute" then
+                loadstring(game:HttpGet(link))()
+                gui:Destroy()
+            else
+                setclipboard(link)
+                button.Text = "Link Copied!"
+                button.TextColor3 = Color3.fromRGB(60, 179, 113)
+                wait(1)
+                button.Text = name
+                button.TextColor3 = textColor
+            end
+        end)
+
+        return button
+    end
+
+    -- Creating universal script button
+    createButton(
+        "OR Open universal script",
+        "https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/universal%20vrs",
+        70,
+        Color3.fromRGB(255, 245, 180),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 200)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 235, 160))},
+        "execute"
+    )
+
+    -- Creating buttons with coordinated soft colors
+    createButton(
+        "Car Crash Test (click to copy link)",
+        "https://www.roblox.com/games/7720943627/Car-Crash-Test",
+        130,
+        Color3.fromRGB(255, 204, 153),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 218, 185)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 182, 139))}
+    )
+    createButton(
+        "Eat Blobs Simulator (click to copy link)",
+        "https://www.roblox.com/games/8200787440/Eat-Blobs-Simulator",
+        190,
+        Color3.fromRGB(173, 216, 230),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(135, 206, 235)), ColorSequenceKeypoint.new(1, Color3.fromRGB(176, 224, 230))}
+    )
+    createButton(
+        "Merge for DIAMONDS (click to copy link)",
+        "https://www.roblox.com/games/132821440336521/Merge-for-DIAMONDS",
+        250,
+        Color3.fromRGB(221, 160, 221),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(216, 191, 216)), ColorSequenceKeypoint.new(1, Color3.fromRGB(238, 174, 238))}
+    )
+    createButton(
+        "Eat Pizza to Grow GIGACHAD (click to copy link)",
+        "https://www.roblox.com/games/86688009497733/Eat-Pizza-to-Grow-GIGACHAD-SUMMER",
+        310,
+        Color3.fromRGB(144, 238, 144),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(152, 251, 152)), ColorSequenceKeypoint.new(1, Color3.fromRGB(127, 205, 127))}
+    )
+    createButton(
+        "Merge For SPEED! (click to copy link)",
+        "https://www.roblox.com/games/118611268319028/Merge-for-SPEED",
+        370,
+        Color3.fromRGB(255, 182, 193),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 192, 203)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 160, 180))}
+    )
+    createButton(
+        "Bubble Gum Jumping (click to copy link)",
+        "https://www.roblox.com/games/105492766146737/Bubble-Gum-Jumping-PETS",
+        430,
+        Color3.fromRGB(255, 228, 225),
+        Color3.fromRGB(50, 50, 50),
+        {ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 245, 238)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 182, 193))}
+    )
+
+    -- Close button (X)
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -40, 0, 10)
+    closeButton.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextSize = 18
+    closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.Parent = frame
+
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeButton
+
+    closeButton.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    -- Dragging functionality
+    local dragging = false
+    local dragInput
+    local dragStart
+    local startPos
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    -- Make GUI responsive for mobile
+    local function adjustForMobile()
+        if game:GetService("UserInputService").TouchEnabled then
+            frame.Size = UDim2.new(0, 230, 0, 480)
+            frame.Position = UDim2.new(0.5, -115, 0.5, -240)
+            title1.TextSize = 20
+            title2.TextSize = 20
+            for _, btn in pairs(frame:GetChildren()) do
+                if btn:IsA("TextButton") and btn.Text ~= "X" then
+                    btn.TextSize = 16
+                    btn.Size = UDim2.new(0.9, 0, 0, 40)
+                end
+            end
+        end
+    end
+    adjustForMobile()
+end

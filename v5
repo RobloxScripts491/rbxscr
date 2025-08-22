@@ -1,0 +1,216 @@
+-- Load the Frosty UI library
+local engine = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AA%20FROSTLIB"))()
+
+-- Frosty UI settings
+local settings = {
+    theme = {
+        images = {
+            open_ui_icon = "rbxassetid://4521836217",
+            close_ui_icon = "rbxassetid://4510354080",
+        },
+        colors = {
+            ["primary color"] = Color3.fromRGB(192, 57, 43),
+            ["secondary color"] = Color3.fromRGB(37, 41, 43),
+            ["drag click"] = Color3.fromRGB(106, 30, 23),
+            ["on color"] = Color3.fromRGB(48, 255, 162),
+            ["exit click"] = Color3.fromRGB(255, 50, 50),
+            ["text color"] = Color3.fromRGB(255, 255, 255)
+        },
+        font = "SourceSans",
+        hotkey = Enum.KeyCode.RightShift -- Default hotkey
+    }
+}
+
+-- Initialize the Frosty library
+local engine = engine(settings)
+local library = engine:init()
+
+-- Global variables
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+local AutoWinEnabled = false
+local currentToggleKey = "RightShift" -- Default key for toggling UI
+
+-- Walkspeed and Jump Power enforcement function
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait() -- Check every frame
+    end
+end
+
+-- Handle character respawn
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Apply to current character
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump using UserInputService
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Create a window
+local window = library:create("window", "<semibold>Script", {
+    resizable = false,
+    default_position = UDim2.new(0, 500, 0, 100),
+    default_size = UDim2.new(0, 325, 0, 150)
+})
+
+-- Create two columns for layout
+local column1 = window:create("column", 150)
+local column2 = window:create("column", 150)
+
+-- Auto Win Toggle
+column1:create("toggle", "Auto Win", false, function(state)
+    _G.GetWins = state
+    AutoWinEnabled = state
+    print("Auto Win: " .. tostring(state))
+    while _G.GetWins do
+        wait()
+        local args = {
+            "\230\142\137\232\144\189\231\137\169Center",
+            "247"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+    end
+end)
+
+-- Infinite Jump Toggle
+column1:create("toggle", "Inf Jump", false, function(state)
+    InfiniteJumpEnabled = state
+    print("Inf Jump: " .. tostring(state))
+end)
+
+-- Walkspeed Slider
+column1:create("slider", "Walkspeed", 16, 100, function(value)
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Character or Humanoid not found!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        return
+    end
+    
+    if value == 0 then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Walkspeed cannot be 0!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        desiredWalkspeed = nil
+        return
+    end
+    
+    desiredWalkspeed = value
+    humanoid.WalkSpeed = value
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Walkspeed set to " .. value,
+        Button1 = "Ok",
+        Duration = 5
+    })
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end, "")
+
+-- Jump Power Slider
+column1:create("slider", "Jump Power", 50, 200, function(value)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "NOTE!",
+        Text = "If it doesn't work, enable Inf Jump",
+        Button1 = "Ok",
+        Duration = 5
+    })
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Character or Humanoid not found!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        return
+    end
+    
+    if value == 0 then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Jump Power cannot be 0!",
+            Button1 = "Ok",
+            Duration = 5
+        })
+        desiredJumpPower = nil
+        return
+    end
+    
+    desiredJumpPower = value
+    humanoid.JumpPower = value
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end, "")
+
+-- Links Dropdown
+column2:create("dropdown", "Links", {[1] = "Youtube Channel"}, 1, function()
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link has been copied!",
+        Text = "Paste it to your browser.",
+        Button1 = "Ok",
+        Duration = 30
+    })
+end)
+
+
+
+-- Labels
+column2:create("label", {Text = "Created by Baris", FontSize = 16, Font = "SourceSans", Color = Color3.fromRGB(255, 255, 255)})
+local toggleKeyLabel = column2:create("label", {Text = "Press <green>" .. currentToggleKey .. "<reset> to hide GUI", FontSize = 16, Font = "SourceSans", Color = Color3.fromRGB(255, 255, 255)})
+
+-- Keybind to set Toggle UI key
+column2:create("keybind", "Set Toggle UI Key", Enum.KeyCode.RightShift, function(key)
+    currentToggleKey = tostring(key):match("Enum%.KeyCode%.(.+)") or tostring(key) -- Extract key name
+    toggleKeyLabel:set_text("<green> Press" .. currentToggleKey .. " to hide GUI") -- Update label
+    settings.theme.hotkey = Enum.KeyCode[currentToggleKey] -- Update Frosty hotkey
+    library:refresh_hotkey() -- Refresh hotkey in Frosty library
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Success",
+        Text = "Toggle UI key set to " .. currentToggleKey,
+        Button1 = "Ok",
+        Duration = 5
+    })
+end)

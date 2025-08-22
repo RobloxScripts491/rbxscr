@@ -1,0 +1,192 @@
+-- Load the AppleLibrary
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/GGHUB/refs/heads/main/AAAAA%20Apple%20Lib"))()
+
+-- Global variables
+local desiredWalkspeed = nil
+local desiredJumpPower = nil
+local plr = game:GetService('Players').LocalPlayer
+local runService = game:GetService('RunService')
+local userInputService = game:GetService('UserInputService')
+local InfiniteJumpEnabled = false
+local AutoWinEnabled = false
+local currentToggleKey = "RightShift" -- Default key for toggling UI
+
+-- Walkspeed and Jump Power enforcement function
+local function enforceValues(humanoid)
+    if not humanoid then return end
+    
+    while humanoid and humanoid.Parent do
+        if desiredWalkspeed and humanoid.WalkSpeed ~= desiredWalkspeed then
+            humanoid.WalkSpeed = desiredWalkspeed
+        end
+        if desiredJumpPower and humanoid.JumpPower ~= desiredJumpPower then
+            humanoid.JumpPower = desiredJumpPower
+        end
+        runService.RenderStepped:Wait() -- Check every frame
+    end
+end
+
+-- Handle character respawn
+plr.CharacterAdded:Connect(function(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    if desiredWalkspeed or desiredJumpPower then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end)
+
+-- Apply to current character
+if plr.Character then
+    local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid and (desiredWalkspeed or desiredJumpPower) then
+        coroutine.wrap(enforceValues)(humanoid)
+    end
+end
+
+-- Infinite Jump using UserInputService
+userInputService.JumpRequest:Connect(function()
+    if InfiniteJumpEnabled then
+        local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- Create a window
+local window = library:init("Script", true, Enum.KeyCode.RightShift, true)
+
+-- Create sections
+local sectionA = window:Section("Controls")
+local sectionB = window:Section("Links & Settings")
+
+-- Divider for sectionA
+sectionA:Divider("Main Features")
+
+-- Auto Win Switch
+sectionA:Switch("Auto Win", false, function(value)
+    _G.GetWins = value
+    AutoWinEnabled = value
+    print("Auto Win: " .. tostring(value))
+    while _G.GetWins do
+        wait()
+        local args = {
+            "\230\142\137\232\144\189\231\137\169Center",
+            "247"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("Msg"):WaitForChild("\229\144\131"):FireServer(unpack(args))
+    end
+end)
+
+-- Infinite Jump Switch
+sectionA:Switch("Inf Jump", false, function(value)
+    InfiniteJumpEnabled = value
+    print("Inf Jump: " .. tostring(value))
+end)
+
+-- Walkspeed TextField (as a slider substitute)
+sectionA:TextField("Walkspeed (16-100)", "16", function(text)
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        window:Notify("Error", "Character or Humanoid not found!", "Ok", "rbxassetid://12608259004", function() end)
+        return
+    end
+    
+    if text == "" then
+        window:Notify("Error", "Please enter a walkspeed value!", "Ok", "rbxassetid://12608259004", function() end)
+        desiredWalkspeed = nil
+        return
+    end
+    
+    local value = tonumber(text)
+    if not value or value < 16 or value > 100 then
+        window:Notify("Error", "Invalid walkspeed! Enter a number between 16 and 100.", "Ok", "rbxassetid://12608259004", function() end)
+        desiredWalkspeed = nil
+        return
+    end
+    
+    desiredWalkspeed = value
+    humanoid.WalkSpeed = value
+    window:Notify("Success", "Walkspeed set to " .. value, "Ok", "rbxassetid://12608259004", function() end)
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end)
+
+-- Jump Power TextField (as a slider substitute)
+sectionA:TextField("Jump Power (50-200)", "50", function(text)
+    window:Notify("NOTE!", "If it doesn't work, enable Inf Jump", "Ok", "rbxassetid://12608259004", function() end)
+    local humanoid = plr.Character and plr.Character:FindFirstChildOfClass('Humanoid')
+    
+    if not humanoid then
+        window:Notify("Error", "Character or Humanoid not found!", "Ok", "rbxassetid://12608259004", function() end)
+        return
+    end
+    
+    if text == "" then
+        window:Notify("Error", "Please enter a jump power value!", "Ok", "rbxassetid://12608259004", function() end)
+        desiredJumpPower = nil
+        return
+    end
+    
+    local value = tonumber(text)
+    if not value or value < 50 or value > 200 then
+        window:Notify("Error", "Invalid jump power! Enter a number between 50 and 200.", "Ok", "rbxassetid://12608259004", function() end)
+        desiredJumpPower = nil
+        return
+    end
+    
+    desiredJumpPower = value
+    humanoid.JumpPower = value
+    
+    coroutine.wrap(enforceValues)(humanoid)
+end)
+
+-- Divider for sectionB
+sectionB:Divider("Links & UI Settings")
+
+-- Links Button (as a substitute for dropdown)
+sectionB:Button("Copy Youtube Link", function()
+    setclipboard("https://www.youtube.com/@BarisScripts1")
+    window:Notify("Success", "Link has been copied! Paste it to your browser.", "Ok", "rbxassetid://12608259004", function() end)
+end)
+
+-- Destroy UI Button
+sectionB:Button("Destroy UI", function()
+    window:Notify2("Are You Sure To Exit?", "Make Sure To Close All Toggles!", "Yes", "No", "rbxassetid://12608259004",
+        function()
+            window:Destroy()
+        end,
+        function()
+            -- Do nothing on "No"
+        end
+    )
+end)
+
+-- Labels
+sectionA:Label("Created by Baris")
+sectionB:Label("Press " .. currentToggleKey .. " to toggle UI")
+
+-- Keybind to set Toggle UI key
+sectionB:Switch("Set Toggle UI Key", false, function(value)
+    if value then
+        -- Start listening for a key press when the switch is enabled
+        local connection
+        connection = userInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+            if not gameProcessedEvent and input.UserInputType == Enum.UserInputType.Keyboard then
+                currentToggleKey = tostring(input.KeyCode):match("Enum%.KeyCode%.(.+)") or tostring(input.KeyCode)
+                sectionB:Label("Press " .. currentToggleKey .. " to toggle UI") -- Update label
+                window:Notify("Success", "Toggle UI key set to " .. currentToggleKey, "Ok", "rbxassetid://12608259004", function() end)
+                -- Update the library's toggle key
+                window:set_key(Enum.KeyCode[currentToggleKey])
+                -- Disable the switch and disconnect the listener
+                sectionB:Switch("Set Toggle UI Key", false, function() end)
+                connection:Disconnect()
+            end
+        end)
+    end
+end)
+
+-- Initialize the UI
+window:Select()

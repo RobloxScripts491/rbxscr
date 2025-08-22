@@ -1,0 +1,131 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts490/rbxscr/refs/heads/main/barislib",true))()
+local tab = library:CreateWindow("bubble gum jumping")
+
+-- Cash Adder with number validation
+tab:AddBox({
+    text = "Cash Adder",
+    value = "",
+    callback = function(value, enter)
+        if enter then
+            local numValue
+            if value:lower() == "inf" then
+                numValue = math.huge
+            else
+                -- Allow scientific notation (e.g., 9e28) and regular numbers
+                numValue = tonumber(value)
+                if not numValue then
+                    library:sednotification("Error!", "Please enter a number!", 3)
+                    return
+                end
+            end
+            
+            local args = {
+                [1] = {
+                    ["value"] = numValue,
+                    ["type"] = "Money",
+                    ["chance"] = 0.3
+                }
+            }
+            game:GetService("ReplicatedStorage").Remotes.Roulette.GiveOutReward:FireServer(unpack(args))
+        end
+    end,
+    flag = "textbox"
+})
+
+-- Inf Trophy toggle with 0.2s interval
+local trophyLoop
+tab:AddToggle({
+    text = "Inf Trophy",
+    flag = "trophy_toggle",
+    callback = function(v)
+        if v then
+            trophyLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                local args = {
+                    [1] = "Layer6"
+                }
+                game:GetService("ReplicatedStorage").Events.LayerChanged:FireServer(unpack(args))
+                wait(0.2)
+            end)
+        else
+            if trophyLoop then
+                trophyLoop:Disconnect()
+                trophyLoop = nil
+            end
+        end
+    end
+})
+
+-- Inf Rebirth toggle with 0.2s interval
+local rebirthLoop
+tab:AddToggle({
+    text = "Inf Rebirth",
+    flag = "rebirth_toggle",
+    callback = function(v)
+        if v then
+            rebirthLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                local args = {
+                    [1] = true
+                }
+                game:GetService("ReplicatedStorage").Events.Rebirth:FireServer(unpack(args))
+                wait(0.2)
+            end)
+        else
+            if rebirthLoop then
+                rebirthLoop:Disconnect()
+                rebirthLoop = nil
+            end
+        end
+    end
+})
+
+-- Inf Ascend toggle with 0.2s interval
+local ascendLoop
+tab:AddToggle({
+    text = "Inf Ascend",
+    flag = "ascend_toggle",
+    callback = function(v)
+        if v then
+            ascendLoop = game:GetService("RunService").Heartbeat:Connect(function()
+                local args = {
+                    [1] = true
+                }
+                game:GetService("ReplicatedStorage").Events.Ascend:FireServer(unpack(args))
+                wait(0.2)
+            end)
+        else
+            if ascendLoop then
+                ascendLoop:Disconnect()
+                ascendLoop = nil
+            end
+        end
+    end
+})
+
+-- Links dropdown
+tab:AddList({
+    text = "Links",
+    values = {"YT Channel(copy link)"},
+    callback = function(value)
+        setclipboard("https://www.youtube.com/@BarisScripts1")
+    end,
+    open = false,
+    flag = "color_option"
+})
+
+-- Toggle UI keybind
+tab:AddBind({
+    text = "Toggle UI",
+    key = "X",
+    hold = false,
+    callback = function()
+        library:Close()
+    end
+})
+
+-- Author label
+tab:AddLabel({
+    text = "By Baris.",
+    type = "label"
+})
+
+library:Init()
