@@ -107,12 +107,18 @@ logDepuracao("Aba de Idiomas criada")
 -- Criar Botão MRB1 na Aba de Idiomas
 local BotaoMRB1
 local sucessoBotaoMRB1, erroBotaoMRB1 = pcall(function()
-   BotaoMRB1 = AbaIdiomas:CreateButton({
-      Name = "Turco",
-      Callback = function()
-         print("32y4ı32yuuerıw")
-      end
-   })
+    BotaoMRB1 = AbaIdiomas:CreateButton({
+        Name = "Inglês",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20ENG")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
 
 if not sucessoBotaoMRB1 then
@@ -121,15 +127,23 @@ if not sucessoBotaoMRB1 then
 end
 logDepuracao("Botão MRB1 criado")
 
--- Criar Botão MRB2 na Aba de Idiomas
+
+
+
 local BotaoMRB2
 local sucessoBotaoMRB2, erroBotaoMRB2 = pcall(function()
-   BotaoMRB2 = AbaIdiomas:CreateButton({
-      Name = "Português",
-      Callback = function()
-         print("lkfdjsfjk")
-      end
-   })
+    BotaoMRB2 = AbaIdiomas:CreateButton({
+        Name = "Turco",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20PORT")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
 
 if not sucessoBotaoMRB2 then
