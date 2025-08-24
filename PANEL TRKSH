@@ -1,0 +1,746 @@
+-- Hata İşleme Fonksiyonu
+local function hataGoster(mesaj)
+   warn("[Hata] " .. mesaj)
+   pcall(function()
+      game:GetService("StarterGui"):SetCore("SendNotification", {
+         Title = "Hata",
+         Text = mesaj,
+         Duration = 5
+      })
+   end)
+end
+
+-- Hata Ayıklama Günlük Fonksiyonu
+local function hataAyiklamaGunlugu(mesaj)
+   print("[Hata Ayıklama] " .. mesaj)
+end
+
+-- Rayfield Kütüphanesini Yükle
+local Rayfield
+local basari, sonuc = pcall(function()
+   return loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+end)
+
+if not basari then
+   hataGoster("Rayfield kütüphanesi yüklenemedi: " .. tostring(sonuc))
+   return
+end
+Rayfield = sonuc
+hataAyiklamaGunlugu("Rayfield kütüphanesi başarıyla yüklendi")
+
+-- Oyun Servislerini Tanımla
+local Oyuncular = game:GetService("Players")
+local CoklanmisDepolama = game:GetService("ReplicatedStorage")
+local YerelOyuncu = Oyuncular.LocalPlayer
+if not YerelOyuncu then
+   hataGoster("YerelOyuncu bulunamadı")
+   return
+end
+hataAyiklamaGunlugu("YerelOyuncu: " .. YerelOyuncu.Name)
+
+-- Ana Pencereyi Oluştur
+local Pencere
+local pencereBasari, pencereHata = pcall(function()
+   Pencere = Rayfield:CreateWindow({
+      Name = "YÖNETİCİ PANELİ",
+      Icon = 0,
+      LoadingTitle = "YÖNETİCİ PANELİ",
+      LoadingSubtitle = "Baris tarafından",
+      ShowText = "Rayfield",
+      Theme = "Default",
+      ToggleUIKeybind = "K",
+      DisableRayfieldPrompts = false,
+      DisableBuildWarnings = false,
+      ConfigurationSaving = {
+         Enabled = true,
+         FolderName = nil,
+         FileName = "Big Hub"
+      },
+      Discord = {
+         Enabled = false,
+         Invite = "davetlinkiyok",
+         RememberJoins = true
+      },
+      KeySystem = false,
+      KeySettings = {
+         Title = "Örnek Anahtar",
+         Subtitle = "Anahtar Sistemi",
+         Note = "Devam etmek için 1 yazın",
+         FileName = "Anahtar",
+         SaveKey = false,
+         GrabKeyFromSite = false,
+         Key = {"1"}
+      }
+   })
+end)
+
+if not pencereBasari then
+   hataGoster("Pencere oluşturulamadı: " .. tostring(pencereHata))
+   return
+end
+hataAyiklamaGunlugu("Pencere başarıyla oluşturuldu")
+
+-- Ana Sekmeyi Oluştur
+local Sekme
+local sekmeBasari, sekmeHata = pcall(function()
+   Sekme = Pencere:CreateTab("YÖNETİCİ", 4483362458)
+end)
+
+if not sekmeBasari then
+   hataGoster("Sekme oluşturulamadı: " .. tostring(sekmeHata))
+   return
+end
+hataAyiklamaGunlugu("Ana Kontroller sekmesi oluşturuldu")
+
+-- Diller Sekmesini Oluştur
+local DillerSekmesi
+local dillerSekmeBasari, dillerSekmeHata = pcall(function()
+   DillerSekmesi = Pencere:CreateTab("Diller", 4483362458)
+end)
+
+if not dillerSekmeBasari then
+   hataGoster("Diller sekmesi oluşturulamadı: " .. tostring(dillerSekmeHata))
+   return
+end
+hataAyiklamaGunlugu("Diller sekmesi oluşturuldu")
+
+-- Diller Sekmesinde MRB1 Düğmesini Oluştur
+local MRB1Dugmesi
+local mrb1DugmeBasari, mrb1DugmeHata = pcall(function()
+   MRB1Dugmesi = DillerSekmesi:CreateButton({
+      Name = "Türkçe",
+      Callback = function()
+         print("32y4ı32yuuerıw")
+      end
+   })
+end)
+
+if not mrb1DugmeBasari then
+   hataGoster("MRB1 Düğmesi oluşturulamadı: " .. tostring(mrb1DugmeHata))
+   return
+end
+hataAyiklamaGunlugu("MRB1 Düğmesi oluşturuldu")
+
+-- Diller Sekmesinde MRB2 Düğmesini Oluştur
+local MRB2Dugmesi
+local mrb2DugmeBasari, mrb2DugmeHata = pcall(function()
+   MRB2Dugmesi = DillerSekmesi:CreateButton({
+      Name = "Portekizce",
+      Callback = function()
+         print("lkfdjsfjk")
+      end
+   })
+end)
+
+if not mrb2DugmeBasari then
+   hataGoster("MRB2 Düğmesi oluşturulamadı: " .. tostring(mrb2DugmeHata))
+   return
+end
+hataAyiklamaGunlugu("MRB2 Düğmesi oluşturuldu")
+
+-- Başlangıç Bildirimi
+local bildirimBasari, bildirimHata = pcall(function()
+   Rayfield:Notify({
+      Title = "Hoş Geldiniz",
+      Content = "Rayfield Arayüz Paketine Hoş Geldiniz!",
+      Duration = 6.5,
+      Image = "home",
+   })
+end)
+if not bildirimBasari then
+   hataGoster("Hoş geldiniz bildirimi gösterilemedi: " .. tostring(bildirimHata))
+end
+
+-- Bölüm: Yönetici Araçları
+Sekme:CreateLabel("Yönetici Araçları", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Sekme:CreateParagraph({
+   Title = "Yönetici Araçları Bölümü",
+   Content = "Kendiniz için yönetici araçlarını seçin ve oluşturun."
+})
+
+-- Yönetici Araçları Açılır Menüsü ve Düğmesi
+local YoneticiAraclariAcilirMenu
+local acilirMenuBasari, acilirMenuHata = pcall(function()
+   YoneticiAraclariAcilirMenu = Sekme:CreateDropdown({
+      Name = "Yönetici Aracı Seç",
+      Options = {
+         "Herkesi Öldür",
+         "Güçlendirme",
+         "Hava Saldırısı",
+         "Herkese Puan Ver",
+         "Anahtar Kart Ver",
+         "Zombi",
+         "PATRON ÖLDÜRÜCÜ",
+         "Uç",
+         "Mum",
+         "Görünmez",
+         "Anahtarlar",
+         "İtici",
+         "Yarasa"
+      },
+      CurrentOption = {"Herkesi Öldür"},
+      MultipleOptions = false,
+      Flag = "YoneticiAraclariAcilirMenu",
+      Callback = function(Secenek)
+         Rayfield:Notify({
+            Title = "Yönetici Araçları",
+            Content = "Seçildi: " .. Secenek[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not acilirMenuBasari then
+   hataGoster("Yönetici Araçları açılır menüsü oluşturulamadı: " .. tostring(acilirMenuHata))
+   return
+end
+
+local OlusturDugmesi
+local olusturDugmeBasari, olusturDugmeHata = pcall(function()
+   OlusturDugmesi = Sekme:CreateButton({
+      Name = "Seçilen Aracı Oluştur",
+      Callback = function()
+         local secilenSecenek = YoneticiAraclariAcilirMenu.CurrentOption[1]
+         local aracEslestirme = {
+            ["Herkesi Öldür"] = "hehehe",
+            ["Güçlendirme"] = "Awaken",
+            ["Hava Saldırısı"] = "Airstrike2",
+            ["Herkese Puan Ver"] = "PointsBroadcast",
+            ["Anahtar Kart Ver"] = "KeyCard",
+            ["Zombi"] = "Zombie",
+            ["PATRON ÖLDÜRÜCÜ"] = "BOSSKILLER",
+            ["Uç"] = "Fly",
+            ["Mum"] = "Fly",
+            ["Görünmez"] = "hidecharacter",
+            ["Anahtarlar"] = "Keys",
+            ["İtici"] = "Thruster",
+            ["Yarasa"] = "spawnbat"
+         }
+         local aracAdi = aracEslestirme[secilenSecenek]
+         if aracAdi then
+            local basari, sonuc = pcall(function()
+               local argumanlar
+               if secilenSecenek == "Herkese Puan Ver" then
+                  CoklanmisDepolama:WaitForChild("PointsBroadcast", 5):FireServer()
+               elseif secilenSecenek == "Görünmez" then
+                  argumanlar = {YerelOyuncu}
+                  CoklanmisDepolama:WaitForChild("hidecharacter", 5):FireServer(unpack(argumanlar))
+               else
+                  argumanlar = {
+                     YerelOyuncu:WaitForChild("Backpack", 5),
+                     CoklanmisDepolama:WaitForChild(aracAdi, 5)
+                  }
+                  CoklanmisDepolama:WaitForChild("EquipTool", 5):FireServer(unpack(argumanlar))
+               end
+            end)
+            if basari then
+               Rayfield:Notify({
+                  Title = "Araç Oluşturuldu",
+                  Content = "Oluşturuldu: " .. secilenSecenek,
+                  Duration = 3,
+               })
+            else
+               hataGoster("Araç oluşturma hatası: " .. tostring(sonuc))
+            end
+         else
+            hataGoster("Araç bulunamadı: " .. secilenSecenek)
+         end
+      end,
+   })
+end)
+
+if not olusturDugmeBasari then
+   hataGoster("Oluştur Düğmesi oluşturulamadı: " .. tostring(olusturDugmeHata))
+   return
+end
+
+-- Bölüm: Oyuncu Yönetimi
+Sekme:CreateLabel("Oyuncu Yönetimi", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Sekme:CreateParagraph({
+   Title = "Oyuncu Yönetimi Bölümü",
+   Content = "Oyuncuları yönetin, seçme, yenileme veya diğer oyuncuları değiştirme dahil."
+})
+
+-- Oyuncu Listesini Güncelleme Fonksiyonu
+local function oyuncuListesiniGuncelle()
+   local oyuncular = Oyuncular:GetPlayers()
+   local oyuncuAdlari = {}
+   for _, oyuncu in ipairs(oyuncular) do
+      if oyuncu and oyuncu.Name then
+         if oyuncu == YerelOyuncu then
+            table.insert(oyuncuAdlari, oyuncu.Name .. " - SİZ")
+         else
+            table.insert(oyuncuAdlari, oyuncu.Name)
+         end
+      end
+   end
+   hataAyiklamaGunlugu("Oyuncu listesi oluşturuldu: " .. (#oyuncuAdlari > 0 and table.concat(oyuncuAdlari, ", ") or "Boş"))
+   return oyuncuAdlari
+end
+
+-- Oyuncu Seçimi Açılır Menüsü
+local OyuncuSecAcilirMenu
+local acilirMenuBasari, acilirMenuHata = pcall(function()
+   OyuncuSecAcilirMenu = Sekme:CreateDropdown({
+      Name = "Oyuncu(lar) Seç",
+      Options = oyuncuListesiniGuncelle(),
+      CurrentOption = {},
+      MultipleOptions = true,
+      Flag = "OyuncuSecAcilirMenu",
+      Callback = function(Secenek)
+         hataAyiklamaGunlugu("Seçilen oyuncular: " .. (#Secenek > 0 and table.concat(Secenek, ", ") or "Hiçbiri"))
+         Rayfield:Notify({
+            Title = "Oyuncu Seçimi",
+            Content = "Seçildi: " .. (#Secenek > 0 and table.concat(Secenek, ", ") or "Hiçbiri"),
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not acilirMenuBasari then
+   hataGoster("Oyuncu açılır menüsü oluşturulamadı: " .. tostring(acilirMenuHata))
+   return
+end
+hataAyiklamaGunlugu("Oyuncu açılır menüsü oluşturuldu")
+
+-- Diğer Oyuncuları Seçme Anahtarı
+local DigerOyuncularSecAnahtari
+local anahtarBasari, anahtarHata = pcall(function()
+   DigerOyuncularSecAnahtari = Sekme:CreateToggle({
+      Name = "Tüm Diğer Oyuncuları Seç",
+      CurrentValue = false,
+      Flag = "DigerOyuncularSecAnahtari",
+      Callback = function(Deger)
+         hataAyiklamaGunlugu("Diğer Oyuncuları Seç: " .. tostring(Deger))
+         local oyuncular = Oyuncular:GetPlayers()
+         local digerOyuncular = {}
+         local mevcutSecimler = OyuncuSecAcilirMenu.CurrentOption or {}
+         
+         if Deger then
+            -- YerelOyuncu hariç tüm diğer oyuncuları ekle
+            for _, oyuncu in ipairs(oyuncular) do
+               if oyuncu and oyuncu.Name and oyuncu ~= YerelOyuncu then
+                  table.insert(digerOyuncular, oyuncu.Name)
+               end
+            end
+            hataAyiklamaGunlugu("Seçilecek diğer oyuncular: " .. (#digerOyuncular > 0 and table.concat(digerOyuncular, ", ") or "Hiçbiri"))
+            
+            -- Açılır menü seçeneklerini güncelle ve seçimleri ayarla
+            local tamOyuncuListesi = oyuncuListesiniGuncelle()
+            local basari, sonuc = pcall(function()
+               OyuncuSecAcilirMenu:Refresh(tamOyuncuListesi)
+               -- Refresh işlemi seçimleri yönetmezse, seçimleri manuel olarak ayarla
+               if #digerOyuncular > 0 then
+                  OyuncuSecAcilirMenu:Set(digerOyuncular)
+               else
+                  OyuncuSecAcilirMenu:Set({})
+               end
+            end)
+            if basari then
+               -- Seçimleri doğrula
+               local mevcutSecenekler = OyuncuSecAcilirMenu.CurrentOption or {}
+               hataAyiklamaGunlugu("Anahtar sonrası mevcut seçimler: " .. (#mevcutSecenekler > 0 and table.concat(mevcutSecenekler, ", ") or "Hiçbiri"))
+               Rayfield:Notify({
+                  Title = "Diğer Oyuncuları Seç",
+                  Content = #digerOyuncular > 0 and "Tüm diğer oyuncular seçildi: " .. table.concat(digerOyuncular, ", ") or "Başka oyuncu mevcut değil",
+                  Duration = 3,
+               })
+            else
+               hataGoster("Diğer oyuncuları seçme hatası: " .. tostring(sonuc))
+            end
+         else
+            -- Seçimleri temizle, ancak YerelOyuncu seçildiyse onu koru
+            local basari, sonuc = pcall(function()
+               local yeniSecimler = {}
+               for _, secim in ipairs(mevcutSecimler) do
+                  if secim == YerelOyuncu.Name .. " - SİZ" then
+                     table.insert(yeniSecimler, secim)
+                  end
+               end
+               OyuncuSecAcilirMenu:Refresh(oyuncuListesiniGuncelle())
+               OyuncuSecAcilirMenu:Set(yeniSecimler)
+            end)
+            if basari then
+               -- Seçimleri doğrula
+               local mevcutSecenekler = OyuncuSecAcilirMenu.CurrentOption or {}
+               hataAyiklamaGunlugu("Anahtar kapatıldıktan sonra mevcut seçimler: " .. (#mevcutSecenekler > 0 and table.concat(mevcutSecenekler, ", ") or "Hiçbiri"))
+               Rayfield:Notify({
+                  Title = "Diğer Oyuncuları Seç",
+                  Content = "Diğer oyuncuların seçimi temizlendi",
+                  Duration = 3,
+               })
+            else
+               hataGoster("Diğer oyuncuların seçimini temizleme hatası: " .. tostring(sonuc))
+            end
+         end
+      end,
+   })
+end)
+
+if not anahtarBasari then
+   hataGoster("Diğer oyuncuları seçme anahtarı oluşturulamadı: " .. tostring(anahtarHata))
+   return
+end
+
+-- Oyuncuları Yenile Düğmesi
+local YenileDugmesi
+local yenileBasari, yenileHata = pcall(function()
+   YenileDugmesi = Sekme:CreateButton({
+      Name = "Oyuncu Listesini Yenile",
+      Callback = function()
+         hataAyiklamaGunlugu("Oyuncu listesi yenileniyor")
+         local yeniOyuncuListesi = oyuncuListesiniGuncelle()
+         local basari, sonuc = pcall(function()
+            OyuncuSecAcilirMenu:Refresh(yeniOyuncuListesi)
+            if #yeniOyuncuListesi == 0 then
+               Rayfield:Notify({
+                  Title = "Oyuncu Listesi Yenilendi",
+                  Content = "Şu anda oyuncu mevcut değil",
+                  Duration = 3,
+               })
+            else
+               Rayfield:Notify({
+                  Title = "Oyuncu Listesi Yenilendi",
+                  Content = "Oyuncu listesi başarıyla yenilendi (" .. #yeniOyuncuListesi .. " oyuncu)",
+                  Duration = 3,
+               })
+            end
+         end)
+         if basari then
+            hataAyiklamaGunlugu("Oyuncu listesi yenilendi: " .. (#yeniOyuncuListesi > 0 and table.concat(yeniOyuncuListesi, ", ") or "Boş"))
+         else
+            hataGoster("Oyuncu listesi yenileme hatası: " .. tostring(sonuc))
+         end
+      end,
+   })
+end)
+
+if not yenileBasari then
+   hataGoster("Yenile Düğmesi oluşturulamadı: " .. tostring(yenileHata))
+   return
+end
+
+-- Oyuncuların girip çıkmasıyla otomatik liste güncelleme
+Oyuncular.PlayerAdded:Connect(function(oyuncu)
+   hataAyiklamaGunlugu("Oyuncu katıldı: " .. (oyuncu and oyuncu.Name or "Bilinmeyen"))
+   local yeniOyuncuListesi = oyuncuListesiniGuncelle()
+   local basari, sonuc = pcall(function()
+      OyuncuSecAcilirMenu:Refresh(yeniOyuncuListesi)
+   end)
+   if basari then
+      Rayfield:Notify({
+         Title = "Oyuncu Listesi Güncellendi",
+         Content = "Oyuncu katıldı, liste güncellendi",
+         Duration = 3,
+      })
+      hataAyiklamaGunlugu("Katılım sonrası oyuncu listesi: " .. (#yeniOyuncuListesi > 0 and table.concat(yeniOyuncuListesi, ", ") or "Boş"))
+   else
+      hataGoster("Oyuncu listesi güncelleme hatası (PlayerAdded): " .. tostring(sonuc))
+   end
+end)
+
+Oyuncular.PlayerRemoving:Connect(function(oyuncu)
+   hataAyiklamaGunlugu("Oyuncu ayrıldı: " .. (oyuncu and oyuncu.Name or "Bilinmeyen"))
+   local yeniOyuncuListesi = oyuncuListesiniGuncelle()
+   local basari, sonuc = pcall(function()
+      OyuncuSecAcilirMenu:Refresh(yeniOyuncuListesi)
+   end)
+   if basari then
+      Rayfield:Notify({
+         Title = "Oyuncu Listesi Güncellendi",
+         Content = "Oyuncu ayrıldı, liste güncellendi",
+         Duration = 3,
+      })
+      hataAyiklamaGunlugu("Ayrılma sonrası oyuncu listesi: " .. (#yeniOyuncuListesi > 0 and table.concat(yeniOyuncuListesi, ", ") or "Boş"))
+   else
+      hataGoster("Oyuncu listesi güncelleme hatası (PlayerRemoving): " .. tostring(sonuc))
+   end
+end)
+
+-- Bölüm: Oyunculara Araç Verme
+Sekme:CreateLabel("Oyunculara Araç Ver", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Sekme:CreateParagraph({
+   Title = "Araç Verme Bölümü",
+   Content = "Seçilen oyunculara seçilen araçları ver."
+})
+
+-- Araç Verme Açılır Menüsü ve Düğmesi
+local AracVerAcilirMenu
+local aracVerBasari, aracVerHata = pcall(function()
+   AracVerAcilirMenu = Sekme:CreateDropdown({
+      Name = "Verilecek Aracı Seç",
+      Options = {
+         "Herkesi Öldür",
+         "Güçlendirme",
+         "Hava Saldırısı",
+         "Herkese Puan Ver",
+         "Anahtar Kart Ver",
+         "Zombi",
+         "PATRON ÖLDÜRÜCÜ",
+         "Uç",
+         "Mum",
+         "Görünmez",
+         "Anahtarlar",
+         "İtici",
+         "Yarasa"
+      },
+      CurrentOption = {"Herkesi Öldür"},
+      MultipleOptions = false,
+      Flag = "AracVerAcilirMenu",
+      Callback = function(Secenek)
+         Rayfield:Notify({
+            Title = "Araç Seçimi",
+            Content = "Seçildi: " .. Secenek[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not aracVerBasari then
+   hataGoster("Araç Verme açılır menüsü oluşturulamadı: " .. tostring(aracVerHata))
+   return
+end
+
+local AracVerDugmesi
+local aracVerDugmeBasari, aracVerDugmeHata = pcall(function()
+   AracVerDugmesi = Sekme:CreateButton({
+      Name = "Seçilen Oyunculara Araç Ver",
+      Callback = function()
+         local secilenOyuncular = OyuncuSecAcilirMenu.CurrentOption
+         local secilenArac = AracVerAcilirMenu.CurrentOption[1]
+         
+         hataAyiklamaGunlugu("Araç Ver - Seçilen oyuncular: " .. (#secilenOyuncular > 0 and table.concat(secilenOyuncular, ", ") or "Hiçbiri"))
+         if #secilenOyuncular == 0 then
+            hataGoster("Hiçbir oyuncu seçilmedi")
+            return
+         end
+
+         local aracEslestirme = {
+            ["Herkesi Öldür"] = "hehehe",
+            ["Güçlendirme"] = "Awaken",
+            ["Hava Saldırısı"] = "Airstrike2",
+            ["Herkese Puan Ver"] = "PointsBroadcast",
+            ["Anahtar Kart Ver"] = "KeyCard",
+            ["Zombi"] = "Zombie",
+            ["PATRON ÖLDÜRÜCÜ"] = "BOSSKILLER",
+            ["Uç"] = "Fly",
+            ["Mum"] = "Fly",
+            ["Görünmez"] = "hidecharacter",
+            ["Anahtarlar"] = "Keys",
+            ["İtici"] = "Thruster",
+            ["Yarasa"] = "spawnbat"
+         }
+
+         for _, secilenOyuncu in ipairs(secilenOyuncular) do
+            local oyuncuAdi = secilenOyuncu:gsub(" - SİZ", "")
+            local oyuncu = Oyuncular:FindFirstChild(oyuncuAdi)
+            if oyuncu then
+               local aracAdi = aracEslestirme[secilenArac]
+               if aracAdi then
+                  local basari, sonuc = pcall(function()
+                     local argumanlar
+                     if secilenArac == "Herkese Puan Ver" then
+                        CoklanmisDepolama:WaitForChild("PointsBroadcast", 5):FireServer()
+                     elseif secilenArac == "Görünmez" then
+                        argumanlar = {oyuncu}
+                        CoklanmisDepolama:WaitForChild("hidecharacter", 5):FireServer(unpack(argumanlar))
+                     else
+                        argumanlar = {
+                           oyuncu:WaitForChild("Backpack", 5),
+                           CoklanmisDepolama:WaitForChild(aracAdi, 5)
+                        }
+                        CoklanmisDepolama:WaitForChild("EquipTool", 5):FireServer(unpack(argumanlar))
+                     end
+                  end)
+                  if basari then
+                     Rayfield:Notify({
+                        Title = "Araç Verildi",
+                        Content = secilenArac .. " aracı " .. oyuncuAdi .. " oyuncusuna verildi",
+                        Duration = 3,
+                     })
+                  else
+                     hataGoster("Araç verme hatası: " .. tostring(sonuc))
+                  end
+               else
+                  hataGoster("Araç bulunamadı: " .. secilenArac)
+               end
+            else
+               hataGoster("Oyuncu bulunamadı: " .. oyuncuAdi)
+            end
+         end
+      end,
+   })
+end)
+
+if not aracVerDugmeBasari then
+   hataGoster("Araç Ver düğmesi oluşturulamadı: " .. tostring(aracVerDugmeHata))
+   return
+end
+
+-- Bölüm: Oyuncuları Atma
+Sekme:CreateLabel("Oyuncuları At", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Sekme:CreateParagraph({
+   Title = "Oyuncuları Atma Bölümü",
+   Content = "Seçilen oyuncuları oyundan at (kendinizi atamazsınız)."
+})
+
+-- Oyuncuları At Düğmesi
+local AtDugmesi
+local atDugmeBasari, atDugmeHata = pcall(function()
+   AtDugmesi = Sekme:CreateButton({
+      Name = "Seçilen Oyuncu(lar)ı At",
+      Callback = function()
+         local secilenSecenekler = OyuncuSecAcilirMenu.CurrentOption or {}
+         hataAyiklamaGunlugu("Oyuncuları At - Seçilen seçenekler: " .. (#secilenSecenekler > 0 and table.concat(secilenSecenekler, ", ") or "Hiçbiri"))
+         
+         -- Anahtar açık ama seçim yoksa, diğer oyuncuları manuel olarak seçmeyi dene
+         if #secilenSecenekler == 0 and DigerOyuncularSecAnahtari.CurrentValue then
+            hataAyiklamaGunlugu("Seçim yok ama anahtar açık, diğer oyuncuları yeniden seçmeyi deniyor")
+            local oyuncular = Oyuncular:GetPlayers()
+            local digerOyuncular = {}
+            for _, oyuncu in ipairs(oyuncular) do
+               if oyuncu and oyuncu.Name and oyuncu ~= YerelOyuncu then
+                  table.insert(digerOyuncular, oyuncu.Name)
+               end
+            end
+            local basari, sonuc = pcall(function()
+               OyuncuSecAcilirMenu:Refresh(oyuncuListesiniGuncelle())
+               if #digerOyuncular > 0 then
+                  OyuncuSecAcilirMenu:Set(digerOyuncular)
+               end
+            end)
+            if basari then
+               secilenSecenekler = digerOyuncular
+               hataAyiklamaGunlugu("Manuel olarak yeniden seçilen oyuncular: " .. (#secilenSecenekler > 0 and table.concat(secilenSecenekler, ", ") or "Hiçbiri"))
+            else
+               hataGoster("Atma için oyuncuları yeniden seçme hatası: " .. tostring(sonuc))
+               return
+            end
+         end
+
+         if #secilenSecenekler == 0 then
+            hataGoster("Atılacak oyuncu seçilmedi")
+            return
+         end
+
+         local hedefAtma = CoklanmisDepolama:WaitForChild("TargetKick", 5)
+         if not hedefAtma then
+            hataGoster("TargetKick uzaktan kumandası bulunamadı")
+            return
+         end
+
+         local yerelOyuncuAdi = YerelOyuncu.Name .. " - SİZ"
+         for _, secilenSecenek in ipairs(secilenSecenekler) do
+            if secilenSecenek == yerelOyuncuAdi then
+               hataGoster("Kendinizi atamazsınız")
+            else
+               local oyuncuAdi = secilenSecenek:gsub(" - SİZ", "")
+               local basari, sonuc = pcall(function()
+                  local argumanlar = {oyuncuAdi}
+                  hedefAtma:FireServer(unpack(argumanlar))
+               end)
+               if basari then
+                  Rayfield:Notify({
+                     Title = "Oyuncu Atıldı",
+                     Content = "Atıldı: " .. oyuncuAdi,
+                     Duration = 3,
+                  })
+               else
+                  hataGoster("Oyuncu atma hatası: " .. tostring(sonuc))
+               end
+            end
+         end
+         local basari, sonuc = pcall(function()
+            CoklanmisDepolama:WaitForChild("GetPoints", 5):FireServer()
+         end)
+         if not basari then
+            hataGoster("GetPoints çağrısı hatası: " .. tostring(sonuc))
+         end
+      end,
+   })
+end)
+
+if not atDugmeBasari then
+   hataGoster("Atma Düğmesi oluşturulamadı: " .. tostring(atDugmeHata))
+   return
+end
+
+-- Bölüm: Puan Değiştirme
+Sekme:CreateLabel("Puan Değiştir", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Sekme:CreateParagraph({
+   Title = "Puan Değiştirme Bölümü",
+   Content = "Seçilen oyuncular için puanları ayarlayın."
+})
+
+-- Puan Değiştirme Girişi
+local PuanGirisi
+local puanGirisBasari, puanGirisHata = pcall(function()
+   PuanGirisi = Sekme:CreateInput({
+      Name = "Seçilen Oyuncu(lar) için Puan Ayarla",
+      CurrentValue = "",
+      PlaceholderText = "Puan girin",
+      RemoveTextAfterFocusLost = false,
+      Flag = "PuanGirisi",
+      Callback = function(Metin)
+         local secilenSecenekler = OyuncuSecAcilirMenu.CurrentOption or {}
+         hataAyiklamaGunlugu("Puan Değiştir - Seçilen oyuncular: " .. (#secilenSecenekler > 0 and table.concat(secilenSecenekler, ", ") or "Hiçbiri"))
+         
+         if #secilenSecenekler == 0 then
+            hataGoster("Hiçbir oyuncu seçilmedi")
+            return
+         end
+
+         local puanlar = tonumber(Metin)
+         if not puanlar then
+            hataGoster("Geçersiz puan değeri girildi")
+            return
+         end
+
+         local istatistikDegistir = CoklanmisDepolama:WaitForChild("changestat", 5)
+         if not istatistikDegistir then
+            hataGoster("changestat uzaktan kumandası bulunamadı")
+            return
+         end
+
+         for _, secilenSecenek in ipairs(secilenSecenekler) do
+            local oyuncuAdi = secilenSecenek:gsub(" - SİZ", "")
+            local basari, sonuc = pcall(function()
+               local argumanlar = {
+                  Oyuncular:WaitForChild(oyuncuAdi, 5):WaitForChild("leaderstats", 5):WaitForChild("Points", 5),
+                  puanlar
+               }
+               istatistikDegistir:FireServer(unpack(argumanlar))
+            end)
+            if basari then
+               Rayfield:Notify({
+                  Title = "Puanlar Değiştirildi",
+                  Content = oyuncuAdi .. " için puanlar " .. puanlar .. " olarak değiştirildi",
+                  Duration = 3,
+               })
+            else
+               hataGoster("Puan değiştirme hatası: " .. tostring(sonuc))
+            end
+         end
+      end,
+   })
+end)
+
+if not puanGirisBasari then
+   hataGoster("Puan Girişi oluşturulamadı: " .. tostring(puanGirisHata))
+   return
+end
+
+-- Başlangıç Oyuncu Listesi Kontrolü
+hataAyiklamaGunlugu("Başlangıç oyuncu listesi kontrolü")
+local baslangicOyuncuListesi = oyuncuListesiniGuncelle()
+local baslangicBasari, baslangicSonuc = pcall(function()
+   OyuncuSecAcilirMenu:Refresh(baslangicOyuncuListesi)
+end)
+if not baslangicBasari then
+   hataGoster("Oyuncu listesi başlatma hatası: " .. tostring(baslangicSonuc))
+else
+   hataAyiklamaGunlugu("Başlangıç oyuncu listesi ayarlandı: " .. (#baslangicOyuncuListesi > 0 and table.concat(baslangicOyuncuListesi, ", ") or "Boş"))
+end
