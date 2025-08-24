@@ -107,12 +107,23 @@ debugLog("Languages tab created")
 -- Create MRB1 Button in Languages Tab
 local MRB1Button
 local mrb1ButtonSuccess, mrb1ButtonError = pcall(function()
-   MRB1Button = LanguagesTab:CreateButton({
-      Name = "Turkish",
-      Callback = function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20TRKSH"))()
-   })
+    MRB1Button = LanguagesTab:CreateButton({
+        Name = "Turkish",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20TRKSH")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
+
+if not mrb1ButtonSuccess then
+    warn("MRB1Button oluşturma hatası: " .. tostring(mrb1ButtonError))
+end
 
 if not mrb1ButtonSuccess then
    showError("Failed to create MRB1 Button: " .. tostring(mrb1ButtonError))
@@ -120,15 +131,27 @@ if not mrb1ButtonSuccess then
 end
 debugLog("MRB1 Button created")
 
--- Create MRB2 Button in Languages Tab
+
 local MRB2Button
 local mrb2ButtonSuccess, mrb2ButtonError = pcall(function()
-   MRB2Button = LanguagesTab:CreateButton({
-      Name = "Portuguese",
-      Callback = function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20PORT"))()
-   })
+    MRB2Button = LanguagesTab:CreateButton({
+        Name = "Portuguese",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20PORT")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
+
+if not mrb2ButtonSuccess then
+    warn("MRB1Button oluşturma hatası: " .. tostring(mrb1ButtonError))
+end
+
 
 if not mrb2ButtonSuccess then
    showError("Failed to create MRB2 Button: " .. tostring(mrb2ButtonError))
