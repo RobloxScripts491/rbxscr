@@ -104,32 +104,42 @@ if not dillerSekmeBasari then
 end
 hataAyiklamaGunlugu("Diller sekmesi oluşturuldu")
 
--- Diller Sekmesinde MRB1 Düğmesini Oluştur
 local MRB1Dugmesi
 local mrb1DugmeBasari, mrb1DugmeHata = pcall(function()
-   MRB1Dugmesi = DillerSekmesi:CreateButton({
-      Name = "Türkçe",
-      Callback = function()
-         print("32y4ı32yuuerıw")
-      end
-   })
+    MRB1Dugmesi = DillerSekmesi:CreateButton({
+        Name = "İngilizce",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20ENG")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
-
 if not mrb1DugmeBasari then
    hataGoster("MRB1 Düğmesi oluşturulamadı: " .. tostring(mrb1DugmeHata))
    return
 end
 hataAyiklamaGunlugu("MRB1 Düğmesi oluşturuldu")
 
--- Diller Sekmesinde MRB2 Düğmesini Oluştur
+
 local MRB2Dugmesi
 local mrb2DugmeBasari, mrb2DugmeHata = pcall(function()
-   MRB2Dugmesi = DillerSekmesi:CreateButton({
-      Name = "Portekizce",
-      Callback = function()
-         print("lkfdjsfjk")
-      end
-   })
+    MRB2Dugmesi = DillerSekmesi:CreateButton({
+        Name = "Portekizce",
+        Callback = function()
+            local success, scriptResult = pcall(function()
+                local script = game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20PORT")
+                return loadstring(script)()
+            end)
+            if not success then
+                warn("Script yükleme hatası: " .. tostring(scriptResult))
+            end
+        end
+    })
 end)
 
 if not mrb2DugmeBasari then
