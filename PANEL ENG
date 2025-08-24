@@ -1,0 +1,744 @@
+-- Error Handling Function
+local function showError(message)
+   warn("[Error] " .. message)
+   pcall(function()
+      game:GetService("StarterGui"):SetCore("SendNotification", {
+         Title = "Error",
+         Text = message,
+         Duration = 5
+      })
+   end)
+end
+
+-- Debug Logging Function
+local function debugLog(message)
+   print("[Debug] " .. message)
+end
+
+-- Load Rayfield Library
+local Rayfield
+local success, result = pcall(function()
+   return loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+end)
+
+if not success then
+   showError("Failed to load Rayfield library: " .. tostring(result))
+   return
+end
+Rayfield = result
+debugLog("Rayfield library loaded successfully")
+
+-- Define Game Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+if not LocalPlayer then
+   showError("LocalPlayer not found")
+   return
+end
+debugLog("LocalPlayer: " .. LocalPlayer.Name)
+
+-- Create Main Window
+local Window
+local windowSuccess, windowError = pcall(function()
+   Window = Rayfield:CreateWindow({
+      Name = "ADMIN PANEL",
+      Icon = 0,
+      LoadingTitle = "ADMIN PANEL",
+      LoadingSubtitle = "by Baris",
+      ShowText = "Rayfield",
+      Theme = "Default",
+      ToggleUIKeybind = "K",
+      DisableRayfieldPrompts = false,
+      DisableBuildWarnings = false,
+      ConfigurationSaving = {
+         Enabled = true,
+         FolderName = nil,
+         FileName = "Big Hub"
+      },
+      Discord = {
+         Enabled = false,
+         Invite = "noinvitelink",
+         RememberJoins = true
+      },
+      KeySystem = false,
+      KeySettings = {
+         Title = "Example Key",
+         Subtitle = "Key System",
+         Note = "Type 1 to continue",
+         FileName = "Key",
+         SaveKey = false,
+         GrabKeyFromSite = false,
+         Key = {"1"}
+      }
+   })
+end)
+
+if not windowSuccess then
+   showError("Failed to create window: " .. tostring(windowError))
+   return
+end
+debugLog("Window created successfully")
+
+-- Create Main Tab
+local Tab
+local tabSuccess, tabError = pcall(function()
+   Tab = Window:CreateTab("ADMIN", 4483362458)
+end)
+
+if not tabSuccess then
+   showError("Failed to create tab: " .. tostring(tabError))
+   return
+end
+debugLog("Main Controls tab created")
+
+-- Create Languages Tab
+local LanguagesTab
+local languagesTabSuccess, languagesTabError = pcall(function()
+   LanguagesTab = Window:CreateTab("Languages", 4483362458)
+end)
+
+if not languagesTabSuccess then
+   showError("Failed to create Languages tab: " .. tostring(languagesTabError))
+   return
+end
+debugLog("Languages tab created")
+
+-- Create MRB1 Button in Languages Tab
+local MRB1Button
+local mrb1ButtonSuccess, mrb1ButtonError = pcall(function()
+   MRB1Button = LanguagesTab:CreateButton({
+      Name = "Turkish",
+      Callback = function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20TRKSH"))()
+   })
+end)
+
+if not mrb1ButtonSuccess then
+   showError("Failed to create MRB1 Button: " .. tostring(mrb1ButtonError))
+   return
+end
+debugLog("MRB1 Button created")
+
+-- Create MRB2 Button in Languages Tab
+local MRB2Button
+local mrb2ButtonSuccess, mrb2ButtonError = pcall(function()
+   MRB2Button = LanguagesTab:CreateButton({
+      Name = "Portuguese",
+      Callback = function()
+         loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScripts491/rbxscr/refs/heads/main/PANEL%20PORT"))()
+   })
+end)
+
+if not mrb2ButtonSuccess then
+   showError("Failed to create MRB2 Button: " .. tostring(mrb2ButtonError))
+   return
+end
+debugLog("MRB2 Button created")
+
+-- Initial Notification
+local notifySuccess, notifyError = pcall(function()
+   Rayfield:Notify({
+      Title = "Welcome",
+      Content = "Welcome to the Rayfield Interface Suite!",
+      Duration = 6.5,
+      Image = "home",
+   })
+end)
+if not notifySuccess then
+   showError("Failed to show welcome notification: " .. tostring(notifyError))
+end
+
+-- Section: Admin Tools
+Tab:CreateLabel("Admin Tools", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Tab:CreateParagraph({
+   Title = "Admin Tools Section",
+   Content = "Select and spawn admin tools for yourself."
+})
+
+-- Admin Tools Dropdown and Button
+local AdminToolsDropdown
+local adminDropdownSuccess, adminDropdownError = pcall(function()
+   AdminToolsDropdown = Tab:CreateDropdown({
+      Name = "Select Admin Tool",
+      Options = {
+         "Kill All",
+         "Buff",
+         "Airstrike",
+         "Give Point Everyone",
+         "Give Keycard",
+         "Zombie",
+         "BOSSKILLER",
+         "Fly",
+         "Candle",
+         "Invisible",
+         "Keys",
+         "Thruster",
+         "Bat"
+      },
+      CurrentOption = {"Kill All"},
+      MultipleOptions = false,
+      Flag = "AdminToolsDropdown",
+      Callback = function(Option)
+         Rayfield:Notify({
+            Title = "Admin Tools",
+            Content = "Selected: " .. Option[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not adminDropdownSuccess then
+   showError("Failed to create Admin Tools dropdown: " .. tostring(adminDropdownError))
+   return
+end
+
+local SpawnButton
+local spawnButtonSuccess, spawnButtonError = pcall(function()
+   SpawnButton = Tab:CreateButton({
+      Name = "Spawn Selected Tool",
+      Callback = function()
+         local selectedOption = AdminToolsDropdown.CurrentOption[1]
+         local toolMapping = {
+            ["Kill All"] = "hehehe",
+            ["Buff"] = "Awaken",
+            ["Airstrike"] = "Airstrike2",
+            ["Give Point Everyone"] = "PointsBroadcast",
+            ["Give Keycard"] = "KeyCard",
+            ["Zombie"] = "Zombie",
+            ["BOSSKILLER"] = "BOSSKILLER",
+            ["Fly"] = "Fly",
+            ["Candle"] = "Fly",
+            ["Invisible"] = "hidecharacter",
+            ["Keys"] = "Keys",
+            ["Thruster"] = "Thruster",
+            ["Bat"] = "spawnbat"
+         }
+         local toolName = toolMapping[selectedOption]
+         if toolName then
+            local success, result = pcall(function()
+               local args
+               if selectedOption == "Give Point Everyone" then
+                  ReplicatedStorage:WaitForChild("PointsBroadcast", 5):FireServer()
+               elseif selectedOption == "Invisible" then
+                  args = {LocalPlayer}
+                  ReplicatedStorage:WaitForChild("hidecharacter", 5):FireServer(unpack(args))
+               else
+                  args = {
+                     LocalPlayer:WaitForChild("Backpack", 5),
+                     ReplicatedStorage:WaitForChild(toolName, 5)
+                  }
+                  ReplicatedStorage:WaitForChild("EquipTool", 5):FireServer(unpack(args))
+               end
+            end)
+            if success then
+               Rayfield:Notify({
+                  Title = "Tool Spawned",
+                  Content = "Spawned: " .. selectedOption,
+                  Duration = 3,
+               })
+            else
+               showError("Error spawning tool: " .. tostring(result))
+            end
+         else
+            showError("Tool not found: " .. selectedOption)
+         end
+      end,
+   })
+end)
+
+if not spawnButtonSuccess then
+   showError("Failed to create Spawn Button: " .. tostring(spawnButtonError))
+   return
+end
+
+-- Section: Player Management
+Tab:CreateLabel("Player Management", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Tab:CreateParagraph({
+   Title = "Player Management Section",
+   Content = "Manage players, including selecting, refreshing, or toggling other players."
+})
+
+-- Player List Update Function
+local function updatePlayerList()
+   local players = Players:GetPlayers()
+   local playerNames = {}
+   for _, player in ipairs(players) do
+      if player and player.Name then
+         if player == LocalPlayer then
+            table.insert(playerNames, player.Name .. " - YOU")
+         else
+            table.insert(playerNames, player.Name)
+         end
+      end
+   end
+   debugLog("Player list generated: " .. (#playerNames > 0 and table.concat(playerNames, ", ") or "Empty"))
+   return playerNames
+end
+
+-- Player Selection Dropdown
+local SelectPlayerDropdown
+local dropdownSuccess, dropdownError = pcall(function()
+   SelectPlayerDropdown = Tab:CreateDropdown({
+      Name = "Select Player(s)",
+      Options = updatePlayerList(),
+      CurrentOption = {},
+      MultipleOptions = true,
+      Flag = "SelectPlayerDropdown",
+      Callback = function(Option)
+         debugLog("Players selected: " .. (#Option > 0 and table.concat(Option, ", ") or "None"))
+         Rayfield:Notify({
+            Title = "Player Selection",
+            Content = "Selected: " .. (#Option > 0 and table.concat(Option, ", ") or "None"),
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not dropdownSuccess then
+   showError("Failed to create player dropdown: " .. tostring(dropdownError))
+   return
+end
+debugLog("Player dropdown created")
+
+-- Select Other Players Toggle
+local SelectOtherPlayersToggle
+local toggleSuccess, toggleError = pcall(function()
+   SelectOtherPlayersToggle = Tab:CreateToggle({
+      Name = "Select All Other Players",
+      CurrentValue = false,
+      Flag = "SelectOtherPlayersToggle",
+      Callback = function(Value)
+         debugLog("Select Other Players toggled: " .. tostring(Value))
+         local players = Players:GetPlayers()
+         local otherPlayers = {}
+         local currentSelections = SelectPlayerDropdown.CurrentOption or {}
+         
+         if Value then
+            -- Add all other players except LocalPlayer
+            for _, player in ipairs(players) do
+               if player and player.Name and player ~= LocalPlayer then
+                  table.insert(otherPlayers, player.Name)
+               end
+            end
+            debugLog("Other players to select: " .. (#otherPlayers > 0 and table.concat(otherPlayers, ", ") or "None"))
+            
+            -- Update dropdown options and set selections
+            local fullPlayerList = updatePlayerList()
+            local success, result = pcall(function()
+               SelectPlayerDropdown:Refresh(fullPlayerList)
+               -- Manually set the selected options if Refresh doesn't handle it
+               if #otherPlayers > 0 then
+                  SelectPlayerDropdown:Set(otherPlayers)
+               else
+                  SelectPlayerDropdown:Set({})
+               end
+            end)
+            if success then
+               -- Verify the selections
+               local currentOptions = SelectPlayerDropdown.CurrentOption or {}
+               debugLog("Current selections after toggle: " .. (#currentOptions > 0 and table.concat(currentOptions, ", ") or "None"))
+               Rayfield:Notify({
+                  Title = "Select Other Players",
+                  Content = #otherPlayers > 0 and "Selected all other players: " .. table.concat(otherPlayers, ", ") or "No other players available",
+                  Duration = 3,
+               })
+            else
+               showError("Error selecting other players: " .. tostring(result))
+            end
+         else
+            -- Clear selections, but keep LocalPlayer if it was selected
+            local success, result = pcall(function()
+               local newSelections = {}
+               for _, selection in ipairs(currentSelections) do
+                  if selection == LocalPlayer.Name .. " - YOU" then
+                     table.insert(newSelections, selection)
+                  end
+               end
+               SelectPlayerDropdown:Refresh(updatePlayerList())
+               SelectPlayerDropdown:Set(newSelections)
+            end)
+            if success then
+               -- Verify the selections
+               local currentOptions = SelectPlayerDropdown.CurrentOption or {}
+               debugLog("Current selections after toggle off: " .. (#currentOptions > 0 and table.concat(currentOptions, ", ") or "None"))
+               Rayfield:Notify({
+                  Title = "Select Other Players",
+                  Content = "Cleared other players selection",
+                  Duration = 3,
+               })
+            else
+               showError("Error clearing other players selection: " .. tostring(result))
+            end
+         end
+      end,
+   })
+end)
+
+if not toggleSuccess then
+   showError("Failed to create Select Other Players toggle: " .. tostring(toggleError))
+   return
+end
+
+-- Refresh Players Button
+local RefreshButton
+local refreshSuccess, refreshError = pcall(function()
+   RefreshButton = Tab:CreateButton({
+      Name = "Refresh Player List",
+      Callback = function()
+         debugLog("Refreshing player list")
+         local newPlayerList = updatePlayerList()
+         local success, result = pcall(function()
+            SelectPlayerDropdown:Refresh(newPlayerList)
+            if #newPlayerList == 0 then
+               Rayfield:Notify({
+                  Title = "Player List Refreshed",
+                  Content = "No players currently available",
+                  Duration = 3,
+               })
+            else
+               Rayfield:Notify({
+                  Title = "Player List Refreshed",
+                  Content = "Player list refreshed successfully (" .. #newPlayerList .. " players)",
+                  Duration = 3,
+               })
+            end
+         end)
+         if success then
+            debugLog("Player list refreshed: " .. (#newPlayerList > 0 and table.concat(newPlayerList, ", ") or "Empty"))
+         else
+            showError("Error refreshing player list: " .. tostring(result))
+         end
+      end,
+   })
+end)
+
+if not refreshSuccess then
+   showError("Failed to create Refresh Button: " .. tostring(refreshError))
+   return
+end
+
+-- Auto-update player list on join/leave
+Players.PlayerAdded:Connect(function(player)
+   debugLog("Player joined: " .. (player and player.Name or "Unknown"))
+   local newPlayerList = updatePlayerList()
+   local success, result = pcall(function()
+      SelectPlayerDropdown:Refresh(newPlayerList)
+   end)
+   if success then
+      Rayfield:Notify({
+         Title = "Player List Updated",
+         Content = "Player joined, list updated",
+         Duration = 3,
+      })
+      debugLog("Player list after join: " .. (#newPlayerList > 0 and table.concat(newPlayerList, ", ") or "Empty"))
+   else
+      showError("Error updating player list (PlayerAdded): " .. tostring(result))
+   end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+   debugLog("Player left: " .. (player and player.Name or "Unknown"))
+   local newPlayerList = updatePlayerList()
+   local success, result = pcall(function()
+      SelectPlayerDropdown:Refresh(newPlayerList)
+   end)
+   if success then
+      Rayfield:Notify({
+         Title = "Player List Updated",
+         Content = "Player left, list updated",
+         Duration = 3,
+      })
+      debugLog("Player list after leave: " .. (#newPlayerList > 0 and table.concat(newPlayerList, ", ") or "Empty"))
+   else
+      showError("Error updating player list (PlayerRemoving): " .. tostring(result))
+   end
+end)
+
+-- Section: Give Tools to Players
+Tab:CreateLabel("Give Tools to Players", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Tab:CreateParagraph({
+   Title = "Give Tools Section",
+   Content = "Give selected tools to chosen players."
+})
+
+-- Give Tool Dropdown and Button
+local GiveToolDropdown
+local giveToolSuccess, giveToolError = pcall(function()
+   GiveToolDropdown = Tab:CreateDropdown({
+      Name = "Select Tool to Give",
+      Options = {
+         "Kill All",
+         "Buff",
+         "Airstrike",
+         "Give Point Everyone",
+         "Give Keycard",
+         "Zombie",
+         "BOSSKILLER",
+         "Fly",
+         "Candle",
+         "Invisible",
+         "Keys",
+         "Thruster",
+         "Bat"
+      },
+      CurrentOption = {"Kill All"},
+      MultipleOptions = false,
+      Flag = "GiveToolDropdown",
+      Callback = function(Option)
+         Rayfield:Notify({
+            Title = "Tool Selection",
+            Content = "Selected: " .. Option[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not giveToolSuccess then
+   showError("Failed to create Give Tool dropdown: " .. tostring(giveToolError))
+   return
+end
+
+local GiveToolSpawnButton
+local giveToolButtonSuccess, giveToolButtonError = pcall(function()
+   GiveToolSpawnButton = Tab:CreateButton({
+      Name = "Give Tool to Selected Players",
+      Callback = function()
+         local selectedPlayers = SelectPlayerDropdown.CurrentOption
+         local selectedTool = GiveToolDropdown.CurrentOption[1]
+         
+         debugLog("Give Tool - Selected players: " .. (#selectedPlayers > 0 and table.concat(selectedPlayers, ", ") or "None"))
+         if #selectedPlayers == 0 then
+            showError("No players selected")
+            return
+         end
+
+         local toolMapping = {
+            ["Kill All"] = "hehehe",
+            ["Buff"] = "Awaken",
+            ["Airstrike"] = "Airstrike2",
+            ["Give Point Everyone"] = "PointsBroadcast",
+            ["Give Keycard"] = "KeyCard",
+            ["Zombie"] = "Zombie",
+            ["BOSSKILLER"] = "BOSSKILLER",
+            ["Fly"] = "Fly",
+            ["Candle"] = "Fly",
+            ["Invisible"] = "hidecharacter",
+            ["Keys"] = "Keys",
+            ["Thruster"] = "Thruster",
+            ["Bat"] = "spawnbat"
+         }
+
+         for _, selectedPlayer in ipairs(selectedPlayers) do
+            local playerName = selectedPlayer:gsub(" - YOU", "")
+            local player = Players:FindFirstChild(playerName)
+            if player then
+               local toolName = toolMapping[selectedTool]
+               if toolName then
+                  local success, result = pcall(function()
+                     local args
+                     if selectedTool == "Give Point Everyone" then
+                        ReplicatedStorage:WaitForChild("PointsBroadcast", 5):FireServer()
+                     elseif selectedTool == "Invisible" then
+                        args = {player}
+                        ReplicatedStorage:WaitForChild("hidecharacter", 5):FireServer(unpack(args))
+                     else
+                        args = {
+                           player:WaitForChild("Backpack", 5),
+                           ReplicatedStorage:WaitForChild(toolName, 5)
+                        }
+                        ReplicatedStorage:WaitForChild("EquipTool", 5):FireServer(unpack(args))
+                     end
+                  end)
+                  if success then
+                     Rayfield:Notify({
+                        Title = "Tool Given",
+                        Content = "Gave " .. selectedTool .. " to " .. playerName,
+                        Duration = 3,
+                     })
+                  else
+                     showError("Error giving tool: " .. tostring(result))
+                  end
+               else
+                  showError("Tool not found: " .. selectedTool)
+               end
+            else
+               showError("Player not found: " .. playerName)
+            end
+         end
+      end,
+   })
+end)
+
+if not giveToolButtonSuccess then
+   showError("Failed to create Give Tool button: " .. tostring(giveToolButtonError))
+   return
+end
+
+-- Section: Kick Players
+Tab:CreateLabel("Kick Players", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Tab:CreateParagraph({
+   Title = "Kick Players Section",
+   Content = "Kick selected players from the game (cannot kick yourself)."
+})
+
+-- Kick Players Button
+local KickButton
+local kickButtonSuccess, kickButtonError = pcall(function()
+   KickButton = Tab:CreateButton({
+      Name = "Kick Selected Player(s)",
+      Callback = function()
+         local selectedOptions = SelectPlayerDropdown.CurrentOption or {}
+         debugLog("Kick Players - Selected options: " .. (#selectedOptions > 0 and table.concat(selectedOptions, ", ") or "None"))
+         
+         -- If toggle is on but no selections, try to select other players manually
+         if #selectedOptions == 0 and SelectOtherPlayersToggle.CurrentValue then
+            debugLog("No selections but toggle is on, attempting to reselect other players")
+            local players = Players:GetPlayers()
+            local otherPlayers = {}
+            for _, player in ipairs(players) do
+               if player and player.Name and player ~= LocalPlayer then
+                  table.insert(otherPlayers, player.Name)
+               end
+            end
+            local success, result = pcall(function()
+               SelectPlayerDropdown:Refresh(updatePlayerList())
+               if #otherPlayers > 0 then
+                  SelectPlayerDropdown:Set(otherPlayers)
+               end
+            end)
+            if success then
+               selectedOptions = otherPlayers
+               debugLog("Manually reselected players: " .. (#selectedOptions > 0 and table.concat(selectedOptions, ", ") or "None"))
+            else
+               showError("Error reselecting players for kick: " .. tostring(result))
+               return
+            end
+         end
+
+         if #selectedOptions == 0 then
+            showError("No players selected to kick")
+            return
+         end
+
+         local targetKick = ReplicatedStorage:WaitForChild("TargetKick", 5)
+         if not targetKick then
+            showError("TargetKick remote not found")
+            return
+         end
+
+         local localPlayerName = LocalPlayer.Name .. " - YOU"
+         for _, selectedOption in ipairs(selectedOptions) do
+            if selectedOption == localPlayerName then
+               showError("Cannot kick yourself")
+            else
+               local playerName = selectedOption:gsub(" - YOU", "")
+               local success, result = pcall(function()
+                  local args = {playerName}
+                  targetKick:FireServer(unpack(args))
+               end)
+               if success then
+                  Rayfield:Notify({
+                     Title = "Player Kicked",
+                     Content = "Kicked: " .. playerName,
+                     Duration = 3,
+                  })
+               else
+                  showError("Error kicking player: " .. tostring(result))
+               end
+            end
+         end
+         local success, result = pcall(function()
+            ReplicatedStorage:WaitForChild("GetPoints", 5):FireServer()
+         end)
+         if not success then
+            showError("Error calling GetPoints: " .. tostring(result))
+         end
+      end,
+   })
+end)
+
+if not kickButtonSuccess then
+   showError("Failed to create Kick Button: " .. tostring(kickButtonError))
+   return
+end
+
+-- Section: Change Points
+Tab:CreateLabel("Change Points", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Tab:CreateParagraph({
+   Title = "Change Points Section",
+   Content = "Set points for selected players."
+})
+
+-- Change Points Input
+local PointsInput
+local pointsInputSuccess, pointsInputError = pcall(function()
+   PointsInput = Tab:CreateInput({
+      Name = "Set Points for Selected Player(s)",
+      CurrentValue = "",
+      PlaceholderText = "Enter points",
+      RemoveTextAfterFocusLost = false,
+      Flag = "PointsInput",
+      Callback = function(Text)
+         local selectedOptions = SelectPlayerDropdown.CurrentOption or {}
+         debugLog("Change Points - Selected players: " .. (#selectedOptions > 0 and table.concat(selectedOptions, ", ") or "None"))
+         
+         if #selectedOptions == 0 then
+            showError("No players selected")
+            return
+         end
+
+         local points = tonumber(Text)
+         if not points then
+            showError("Invalid points value entered")
+            return
+         end
+
+         local changestat = ReplicatedStorage:WaitForChild("changestat", 5)
+         if not changestat then
+            showError("changestat remote not found")
+            return
+         end
+
+         for _, selectedOption in ipairs(selectedOptions) do
+            local playerName = selectedOption:gsub(" - YOU", "")
+            local success, result = pcall(function()
+               local args = {
+                  Players:WaitForChild(playerName, 5):WaitForChild("leaderstats", 5):WaitForChild("Points", 5),
+                  points
+               }
+               changestat:FireServer(unpack(args))
+            end)
+            if success then
+               Rayfield:Notify({
+                  Title = "Points Changed",
+                  Content = "Changed points for " .. playerName .. " to " .. points,
+                  Duration = 3,
+               })
+            else
+               showError("Error changing points: " .. tostring(result))
+            end
+         end
+      end,
+   })
+end)
+
+if not pointsInputSuccess then
+   showError("Failed to create Points Input: " .. tostring(pointsInputError))
+   return
+end
+
+-- Initial Player List Check
+debugLog("Initial player list check")
+local initialPlayerList = updatePlayerList()
+local initialSuccess, initialResult = pcall(function()
+   SelectPlayerDropdown:Refresh(initialPlayerList)
+end)
+if not initialSuccess then
+   showError("Error initializing player list: " .. tostring(initialResult))
+else
+   debugLog("Initial player list set: " .. (#initialPlayerList > 0 and table.concat(initialPlayerList, ", ") or "Empty"))
+end
