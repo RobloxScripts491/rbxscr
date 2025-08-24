@@ -1,0 +1,746 @@
+-- Função de Tratamento de Erros
+local function mostrarErro(mensagem)
+   warn("[Erro] " .. mensagem)
+   pcall(function()
+      game:GetService("StarterGui"):SetCore("SendNotification", {
+         Title = "Erro",
+         Text = mensagem,
+         Duration = 5
+      })
+   end)
+end
+
+-- Função de Log de Depuração
+local function logDepuracao(mensagem)
+   print("[Depuração] " .. mensagem)
+end
+
+-- Carregar Biblioteca Rayfield
+local Rayfield
+local sucesso, resultado = pcall(function()
+   return loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+end)
+
+if not sucesso then
+   mostrarErro("Falha ao carregar a biblioteca Rayfield: " .. tostring(resultado))
+   return
+end
+Rayfield = resultado
+logDepuracao("Biblioteca Rayfield carregada com sucesso")
+
+-- Definir Serviços do Jogo
+local Jogadores = game:GetService("Players")
+local ArmazenamentoReplicado = game:GetService("ReplicatedStorage")
+local JogadorLocal = Jogadores.LocalPlayer
+if not JogadorLocal then
+   mostrarErro("JogadorLocal não encontrado")
+   return
+end
+logDepuracao("JogadorLocal: " .. JogadorLocal.Name)
+
+-- Criar Janela Principal
+local Janela
+local sucessoJanela, erroJanela = pcall(function()
+   Janela = Rayfield:CreateWindow({
+      Name = "PAINEL DE ADMIN",
+      Icon = 0,
+      LoadingTitle = "PAINEL DE ADMIN",
+      LoadingSubtitle = "por Baris",
+      ShowText = "Rayfield",
+      Theme = "Default",
+      ToggleUIKeybind = "K",
+      DisableRayfieldPrompts = false,
+      DisableBuildWarnings = false,
+      ConfigurationSaving = {
+         Enabled = true,
+         FolderName = nil,
+         FileName = "Big Hub"
+      },
+      Discord = {
+         Enabled = false,
+         Invite = "semlinkdeconvite",
+         RememberJoins = true
+      },
+      KeySystem = false,
+      KeySettings = {
+         Title = "Chave de Exemplo",
+         Subtitle = "Sistema de Chave",
+         Note = "Digite 1 para continuar",
+         FileName = "Chave",
+         SaveKey = false,
+         GrabKeyFromSite = false,
+         Key = {"1"}
+      }
+   })
+end)
+
+if not sucessoJanela then
+   mostrarErro("Falha ao criar a janela: " .. tostring(erroJanela))
+   return
+end
+logDepuracao("Janela criada com sucesso")
+
+-- Criar Aba Principal
+local Aba
+local sucessoAba, erroAba = pcall(function()
+   Aba = Janela:CreateTab("ADMIN", 4483362458)
+end)
+
+if not sucessoAba then
+   mostrarErro("Falha ao criar a aba: " .. tostring(erroAba))
+   return
+end
+logDepuracao("Aba de Controles Principais criada")
+
+-- Criar Aba de Idiomas
+local AbaIdiomas
+local sucessoAbaIdiomas, erroAbaIdiomas = pcall(function()
+   AbaIdiomas = Janela:CreateTab("Idiomas", 4483362458)
+end)
+
+if not sucessoAbaIdiomas then
+   mostrarErro("Falha ao criar a aba de Idiomas: " .. tostring(erroAbaIdiomas))
+   return
+end
+logDepuracao("Aba de Idiomas criada")
+
+-- Criar Botão MRB1 na Aba de Idiomas
+local BotaoMRB1
+local sucessoBotaoMRB1, erroBotaoMRB1 = pcall(function()
+   BotaoMRB1 = AbaIdiomas:CreateButton({
+      Name = "Turco",
+      Callback = function()
+         print("32y4ı32yuuerıw")
+      end
+   })
+end)
+
+if not sucessoBotaoMRB1 then
+   mostrarErro("Falha ao criar o Botão MRB1: " .. tostring(erroBotaoMRB1))
+   return
+end
+logDepuracao("Botão MRB1 criado")
+
+-- Criar Botão MRB2 na Aba de Idiomas
+local BotaoMRB2
+local sucessoBotaoMRB2, erroBotaoMRB2 = pcall(function()
+   BotaoMRB2 = AbaIdiomas:CreateButton({
+      Name = "Português",
+      Callback = function()
+         print("lkfdjsfjk")
+      end
+   })
+end)
+
+if not sucessoBotaoMRB2 then
+   mostrarErro("Falha ao criar o Botão MRB2: " .. tostring(erroBotaoMRB2))
+   return
+end
+logDepuracao("Botão MRB2 criado")
+
+-- Notificação Inicial
+local sucessoNotificacao, erroNotificacao = pcall(function()
+   Rayfield:Notify({
+      Title = "Bem-vindo",
+      Content = "Bem-vindo à Suíte de Interface Rayfield!",
+      Duration = 6.5,
+      Image = "home",
+   })
+end)
+if not sucessoNotificacao then
+   mostrarErro("Falha ao exibir notificação de boas-vindas: " .. tostring(erroNotificacao))
+end
+
+-- Seção: Ferramentas de Admin
+Aba:CreateLabel("Ferramentas de Admin", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Aba:CreateParagraph({
+   Title = "Seção de Ferramentas de Admin",
+   Content = "Selecione e crie ferramentas de admin para si mesmo."
+})
+
+-- Dropdown e Botão de Ferramentas de Admin
+local DropdownFerramentasAdmin
+local sucessoDropdownAdmin, erroDropdownAdmin = pcall(function()
+   DropdownFerramentasAdmin = Aba:CreateDropdown({
+      Name = "Selecionar Ferramenta de Admin",
+      Options = {
+         "Matar Todos",
+         "Buff",
+         "Ataque Aéreo",
+         "Dar Ponto a Todos",
+         "Dar Cartão de Acesso",
+         "Zumbi",
+         "MATAR BOSS",
+         "Voar",
+         "Vela",
+         "Invisível",
+         "Chaves",
+         "Propulsor",
+         "Morcego"
+      },
+      CurrentOption = {"Matar Todos"},
+      MultipleOptions = false,
+      Flag = "DropdownFerramentasAdmin",
+      Callback = function(Opcao)
+         Rayfield:Notify({
+            Title = "Ferramentas de Admin",
+            Content = "Selecionado: " .. Opcao[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not sucessoDropdownAdmin then
+   mostrarErro("Falha ao criar dropdown de Ferramentas de Admin: " .. tostring(erroDropdownAdmin))
+   return
+end
+
+local BotaoCriar
+local sucessoBotaoCriar, erroBotaoCriar = pcall(function()
+   BotaoCriar = Aba:CreateButton({
+      Name = "Criar Ferramenta Selecionada",
+      Callback = function()
+         local opcaoSelecionada = DropdownFerramentasAdmin.CurrentOption[1]
+         local mapeamentoFerramentas = {
+            ["Matar Todos"] = "hehehe",
+            ["Buff"] = "Awaken",
+            ["Ataque Aéreo"] = "Airstrike2",
+            ["Dar Ponto a Todos"] = "PointsBroadcast",
+            ["Dar Cartão de Acesso"] = "KeyCard",
+            ["Zumbi"] = "Zombie",
+            ["MATAR BOSS"] = "BOSSKILLER",
+            ["Voar"] = "Fly",
+            ["Vela"] = "Fly",
+            ["Invisível"] = "hidecharacter",
+            ["Chaves"] = "Keys",
+            ["Propulsor"] = "Thruster",
+            ["Morcego"] = "spawnbat"
+         }
+         local nomeFerramenta = mapeamentoFerramentas[opcaoSelecionada]
+         if nomeFerramenta then
+            local sucesso, resultado = pcall(function()
+               local argumentos
+               if opcaoSelecionada == "Dar Ponto a Todos" then
+                  ArmazenamentoReplicado:WaitForChild("PointsBroadcast", 5):FireServer()
+               elseif opcaoSelecionada == "Invisível" then
+                  argumentos = {JogadorLocal}
+                  ArmazenamentoReplicado:WaitForChild("hidecharacter", 5):FireServer(unpack(argumentos))
+               else
+                  argumentos = {
+                     JogadorLocal:WaitForChild("Backpack", 5),
+                     ArmazenamentoReplicado:WaitForChild(nomeFerramenta, 5)
+                  }
+                  ArmazenamentoReplicado:WaitForChild("EquipTool", 5):FireServer(unpack(argumentos))
+               end
+            end)
+            if sucesso then
+               Rayfield:Notify({
+                  Title = "Ferramenta Criada",
+                  Content = "Criado: " .. opcaoSelecionada,
+                  Duration = 3,
+               })
+            else
+               mostrarErro("Erro ao criar ferramenta: " .. tostring(resultado))
+            end
+         else
+            mostrarErro("Ferramenta não encontrada: " .. opcaoSelecionada)
+         end
+      end,
+   })
+end)
+
+if not sucessoBotaoCriar then
+   mostrarErro("Falha ao criar Botão de Criação: " .. tostring(erroBotaoCriar))
+   return
+end
+
+-- Seção: Gerenciamento de Jogadores
+Aba:CreateLabel("Gerenciamento de Jogadores", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Aba:CreateParagraph({
+   Title = "Seção de Gerenciamento de Jogadores",
+   Content = "Gerencie jogadores, incluindo selecionar, atualizar ou alternar outros jogadores."
+})
+
+-- Função de Atualização da Lista de Jogadores
+local function atualizarListaJogadores()
+   local jogadores = Jogadores:GetPlayers()
+   local nomesJogadores = {}
+   for _, jogador in ipairs(jogadores) do
+      if jogador and jogador.Name then
+         if jogador == JogadorLocal then
+            table.insert(nomesJogadores, jogador.Name .. " - VOCÊ")
+         else
+            table.insert(nomesJogadores, jogador.Name)
+         end
+      end
+   end
+   logDepuracao("Lista de jogadores gerada: " .. (#nomesJogadores > 0 and table.concat(nomesJogadores, ", ") or "Vazia"))
+   return nomesJogadores
+end
+
+-- Dropdown de Seleção de Jogadores
+local DropdownSelecionarJogador
+local sucessoDropdown, erroDropdown = pcall(function()
+   DropdownSelecionarJogador = Aba:CreateDropdown({
+      Name = "Selecionar Jogador(es)",
+      Options = atualizarListaJogadores(),
+      CurrentOption = {},
+      MultipleOptions = true,
+      Flag = "DropdownSelecionarJogador",
+      Callback = function(Opcao)
+         logDepuracao("Jogadores selecionados: " .. (#Opcao > 0 and table.concat(Opcao, ", ") or "Nenhum"))
+         Rayfield:Notify({
+            Title = "Seleção de Jogadores",
+            Content = "Selecionado: " .. (#Opcao > 0 and table.concat(Opcao, ", ") or "Nenhum"),
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not sucessoDropdown then
+   mostrarErro("Falha ao criar dropdown de jogadores: " .. tostring(erroDropdown))
+   return
+end
+logDepuracao("Dropdown de jogadores criado")
+
+-- Alternar Seleção de Outros Jogadores
+local AlternarOutrosJogadores
+local sucessoAlternar, erroAlternar = pcall(function()
+   AlternarOutrosJogadores = Aba:CreateToggle({
+      Name = "Selecionar Todos os Outros Jogadores",
+      CurrentValue = false,
+      Flag = "AlternarOutrosJogadores",
+      Callback = function(Valor)
+         logDepuracao("Alternar Outros Jogadores: " .. tostring(Valor))
+         local jogadores = Jogadores:GetPlayers()
+         local outrosJogadores = {}
+         local selecoesAtuais = DropdownSelecionarJogador.CurrentOption or {}
+         
+         if Valor then
+            -- Adicionar todos os outros jogadores, exceto o JogadorLocal
+            for _, jogador in ipairs(jogadores) do
+               if jogador and jogador.Name and jogador ~= JogadorLocal then
+                  table.insert(outrosJogadores, jogador.Name)
+               end
+            end
+            logDepuracao("Outros jogadores a selecionar: " .. (#outrosJogadores > 0 and table.concat(outrosJogadores, ", ") or "Nenhum"))
+            
+            -- Atualizar opções do dropdown e definir seleções
+            local listaCompletaJogadores = atualizarListaJogadores()
+            local sucesso, resultado = pcall(function()
+               DropdownSelecionarJogador:Refresh(listaCompletaJogadores)
+               -- Definir manualmente as opções selecionadas se Refresh não lidar com isso
+               if #outrosJogadores > 0 then
+                  DropdownSelecionarJogador:Set(outrosJogadores)
+               else
+                  DropdownSelecionarJogador:Set({})
+               end
+            end)
+            if sucesso then
+               -- Verificar as seleções
+               local opcoesAtuais = DropdownSelecionarJogador.CurrentOption or {}
+               logDepuracao("Seleções atuais após alternar: " .. (#opcoesAtuais > 0 and table.concat(opcoesAtuais, ", ") or "Nenhum"))
+               Rayfield:Notify({
+                  Title = "Selecionar Outros Jogadores",
+                  Content = #outrosJogadores > 0 and "Selecionou todos os outros jogadores: " .. table.concat(outrosJogadores, ", ") or "Nenhum outro jogador disponível",
+                  Duration = 3,
+               })
+            else
+               mostrarErro("Erro ao selecionar outros jogadores: " .. tostring(resultado))
+            end
+         else
+            -- Limpar seleções, mas manter o JogadorLocal se selecionado
+            local sucesso, resultado = pcall(function()
+               local novasSelecoes = {}
+               for _, selecao in ipairs(selecoesAtuais) do
+                  if selecao == JogadorLocal.Name .. " - VOCÊ" then
+                     table.insert(novasSelecoes, selecao)
+                  end
+               end
+               DropdownSelecionarJogador:Refresh(atualizarListaJogadores())
+               DropdownSelecionarJogador:Set(novasSelecoes)
+            end)
+            if sucesso then
+               -- Verificar as seleções
+               local opcoesAtuais = DropdownSelecionarJogador.CurrentOption or {}
+               logDepuracao("Seleções atuais após desativar: " .. (#opcoesAtuais > 0 and table.concat(opcoesAtuais, ", ") or "Nenhum"))
+               Rayfield:Notify({
+                  Title = "Selecionar Outros Jogadores",
+                  Content = "Seleção de outros jogadores limpa",
+                  Duration = 3,
+               })
+            else
+               mostrarErro("Erro ao limpar seleção de outros jogadores: " .. tostring(resultado))
+            end
+         end
+      end,
+   })
+end)
+
+if not sucessoAlternar then
+   mostrarErro("Falha ao criar alternância de outros jogadores: " .. tostring(erroAlternar))
+   return
+end
+
+-- Botão de Atualizar Jogadores
+local BotaoAtualizar
+local sucessoAtualizar, erroAtualizar = pcall(function()
+   BotaoAtualizar = Aba:CreateButton({
+      Name = "Atualizar Lista de Jogadores",
+      Callback = function()
+         logDepuracao("Atualizando lista de jogadores")
+         local novaListaJogadores = atualizarListaJogadores()
+         local sucesso, resultado = pcall(function()
+            DropdownSelecionarJogador:Refresh(novaListaJogadores)
+            if #novaListaJogadores == 0 then
+               Rayfield:Notify({
+                  Title = "Lista de Jogadores Atualizada",
+                  Content = "Nenhum jogador disponível no momento",
+                  Duration = 3,
+               })
+            else
+               Rayfield:Notify({
+                  Title = "Lista de Jogadores Atualizada",
+                  Content = "Lista de jogadores atualizada com sucesso (" .. #novaListaJogadores .. " jogadores)",
+                  Duration = 3,
+               })
+            end
+         end)
+         if sucesso then
+            logDepuracao("Lista de jogadores atualizada: " .. (#novaListaJogadores > 0 and table.concat(novaListaJogadores, ", ") or "Vazia"))
+         else
+            mostrarErro("Erro ao atualizar lista de jogadores: " .. tostring(resultado))
+         end
+      end,
+   })
+end)
+
+if not sucessoAtualizar then
+   mostrarErro("Falha ao criar Botão de Atualização: " .. tostring(erroAtualizar))
+   return
+end
+
+-- Atualização automática da lista de jogadores ao entrar/sair
+Jogadores.PlayerAdded:Connect(function(jogador)
+   logDepuracao("Jogador entrou: " .. (jogador and jogador.Name or "Desconhecido"))
+   local novaListaJogadores = atualizarListaJogadores()
+   local sucesso, resultado = pcall(function()
+      DropdownSelecionarJogador:Refresh(novaListaJogadores)
+   end)
+   if sucesso then
+      Rayfield:Notify({
+         Title = "Lista de Jogadores Atualizada",
+         Content = "Jogador entrou, lista atualizada",
+         Duration = 3,
+      })
+      logDepuracao("Lista de jogadores após entrada: " .. (#novaListaJogadores > 0 and table.concat(novaListaJogadores, ", ") or "Vazia"))
+   else
+      mostrarErro("Erro ao atualizar lista de jogadores (PlayerAdded): " .. tostring(resultado))
+   end
+end)
+
+Jogadores.PlayerRemoving:Connect(function(jogador)
+   logDepuracao("Jogador saiu: " .. (jogador and jogador.Name or "Desconhecido"))
+   local novaListaJogadores = atualizarListaJogadores()
+   local sucesso, resultado = pcall(function()
+      DropdownSelecionarJogador:Refresh(novaListaJogadores)
+   end)
+   if sucesso then
+      Rayfield:Notify({
+         Title = "Lista de Jogadores Atualizada",
+         Content = "Jogador saiu, lista atualizada",
+         Duration = 3,
+      })
+      logDepuracao("Lista de jogadores após saída: " .. (#novaListaJogadores > 0 and table.concat(novaListaJogadores, ", ") or "Vazia"))
+   else
+      mostrarErro("Erro ao atualizar lista de jogadores (PlayerRemoving): " .. tostring(resultado))
+   end
+end)
+
+-- Seção: Dar Ferramentas aos Jogadores
+Aba:CreateLabel("Dar Ferramentas aos Jogadores", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Aba:CreateParagraph({
+   Title = "Seção de Dar Ferramentas",
+   Content = "Dê ferramentas selecionadas aos jogadores escolhidos."
+})
+
+-- Dropdown e Botão de Dar Ferramentas
+local DropdownDarFerramenta
+local sucessoDarFerramenta, erroDarFerramenta = pcall(function()
+   DropdownDarFerramenta = Aba:CreateDropdown({
+      Name = "Selecionar Ferramenta para Dar",
+      Options = {
+         "Matar Todos",
+         "Buff",
+         "Ataque Aéreo",
+         "Dar Ponto a Todos",
+         "Dar Cartão de Acesso",
+         "Zumbi",
+         "MATAR BOSS",
+         "Voar",
+         "Vela",
+         "Invisível",
+         "Chaves",
+         "Propulsor",
+         "Morcego"
+      },
+      CurrentOption = {"Matar Todos"},
+      MultipleOptions = false,
+      Flag = "DropdownDarFerramenta",
+      Callback = function(Opcao)
+         Rayfield:Notify({
+            Title = "Seleção de Ferramenta",
+            Content = "Selecionado: " .. Opcao[1],
+            Duration = 3,
+         })
+      end,
+   })
+end)
+
+if not sucessoDarFerramenta then
+   mostrarErro("Falha ao criar dropdown de Dar Ferramenta: " .. tostring(erroDarFerramenta))
+   return
+end
+
+local BotaoDarFerramenta
+local sucessoBotaoDarFerramenta, erroBotaoDarFerramenta = pcall(function()
+   BotaoDarFerramenta = Aba:CreateButton({
+      Name = "Dar Ferramenta aos Jogadores Selecionados",
+      Callback = function()
+         local jogadoresSelecionados = DropdownSelecionarJogador.CurrentOption
+         local ferramentaSelecionada = DropdownDarFerramenta.CurrentOption[1]
+         
+         logDepuracao("Dar Ferramenta - Jogadores selecionados: " .. (#jogadoresSelecionados > 0 and table.concat(jogadoresSelecionados, ", ") or "Nenhum"))
+         if #jogadoresSelecionados == 0 then
+            mostrarErro("Nenhum jogador selecionado")
+            return
+         end
+
+         local mapeamentoFerramentas = {
+            ["Matar Todos"] = "hehehe",
+            ["Buff"] = "Awaken",
+            ["Ataque Aéreo"] = "Airstrike2",
+            ["Dar Ponto a Todos"] = "PointsBroadcast",
+            ["Dar Cartão de Acesso"] = "KeyCard",
+            ["Zumbi"] = "Zombie",
+            ["MATAR BOSS"] = "BOSSKILLER",
+            ["Voar"] = "Fly",
+            ["Vela"] = "Fly",
+            ["Invisível"] = "hidecharacter",
+            ["Chaves"] = "Keys",
+            ["Propulsor"] = "Thruster",
+            ["Morcego"] = "spawnbat"
+         }
+
+         for _, jogadorSelecionado in ipairs(jogadoresSelecionados) do
+            local nomeJogador = jogadorSelecionado:gsub(" - VOCÊ", "")
+            local jogador = Jogadores:FindFirstChild(nomeJogador)
+            if jogador then
+               local nomeFerramenta = mapeamentoFerramentas[ferramentaSelecionada]
+               if nomeFerramenta then
+                  local sucesso, resultado = pcall(function()
+                     local argumentos
+                     if ferramentaSelecionada == "Dar Ponto a Todos" then
+                        ArmazenamentoReplicado:WaitForChild("PointsBroadcast", 5):FireServer()
+                     elseif ferramentaSelecionada == "Invisível" then
+                        argumentos = {jogador}
+                        ArmazenamentoReplicado:WaitForChild("hidecharacter", 5):FireServer(unpack(argumentos))
+                     else
+                        argumentos = {
+                           jogador:WaitForChild("Backpack", 5),
+                           ArmazenamentoReplicado:WaitForChild(nomeFerramenta, 5)
+                        }
+                        ArmazenamentoReplicado:WaitForChild("EquipTool", 5):FireServer(unpack(argumentos))
+                     end
+                  end)
+                  if sucesso then
+                     Rayfield:Notify({
+                        Title = "Ferramenta Dada",
+                        Content = "Deu " .. ferramentaSelecionada .. " para " .. nomeJogador,
+                        Duration = 3,
+                     })
+                  else
+                     mostrarErro("Erro ao dar ferramenta: " .. tostring(resultado))
+                  end
+               else
+                  mostrarErro("Ferramenta não encontrada: " .. ferramentaSelecionada)
+               end
+            else
+               mostrarErro("Jogador não encontrado: " .. nomeJogador)
+            end
+         end
+      end,
+   })
+end)
+
+if not sucessoBotaoDarFerramenta then
+   mostrarErro("Falha ao criar botão de Dar Ferramenta: " .. tostring(erroBotaoDarFerramenta))
+   return
+end
+
+-- Seção: Expulsar Jogadores
+Aba:CreateLabel("Expulsar Jogadores", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Aba:CreateParagraph({
+   Title = "Seção de Expulsar Jogadores",
+   Content = "Expulse os jogadores selecionados do jogo (não pode expulsar a si mesmo)."
+})
+
+-- Botão de Expulsar Jogadores
+local BotaoExpulsar
+local sucessoBotaoExpulsar, erroBotaoExpulsar = pcall(function()
+   BotaoExpulsar = Aba:CreateButton({
+      Name = "Expulsar Jogador(es) Selecionado(s)",
+      Callback = function()
+         local opcoesSelecionadas = DropdownSelecionarJogador.CurrentOption or {}
+         logDepuracao("Expulsar Jogadores - Opções selecionadas: " .. (#opcoesSelecionadas > 0 and table.concat(opcoesSelecionadas, ", ") or "Nenhum"))
+         
+         -- Se a alternância está ligada mas não há seleções, tentar selecionar outros jogadores manualmente
+         if #opcoesSelecionadas == 0 and AlternarOutrosJogadores.CurrentValue then
+            logDepuracao("Sem seleções mas a alternância está ligada, tentando reselecionar outros jogadores")
+            local jogadores = Jogadores:GetPlayers()
+            local outrosJogadores = {}
+            for _, jogador in ipairs(jogadores) do
+               if jogador and jogador.Name and jogador ~= JogadorLocal then
+                  table.insert(outrosJogadores, jogador.Name)
+               end
+            end
+            local sucesso, resultado = pcall(function()
+               DropdownSelecionarJogador:Refresh(atualizarListaJogadores())
+               if #outrosJogadores > 0 then
+                  DropdownSelecionarJogador:Set(outrosJogadores)
+               end
+            end)
+            if sucesso then
+               opcoesSelecionadas = outrosJogadores
+               logDepuracao("Jogadores reselecionados manualmente: " .. (#opcoesSelecionadas > 0 and table.concat(opcoesSelecionadas, ", ") or "Nenhum"))
+            else
+               mostrarErro("Erro ao reselecionar jogadores para expulsão: " .. tostring(resultado))
+               return
+            end
+         end
+
+         if #opcoesSelecionadas == 0 then
+            mostrarErro("Nenhum jogador selecionado para expulsar")
+            return
+         end
+
+         local expulsaoAlvo = ArmazenamentoReplicado:WaitForChild("TargetKick", 5)
+         if not expulsaoAlvo then
+            mostrarErro("Remoto TargetKick não encontrado")
+            return
+         end
+
+         local nomeJogadorLocal = JogadorLocal.Name .. " - VOCÊ"
+         for _, opcaoSelecionada in ipairs(opcoesSelecionadas) do
+            if opcaoSelecionada == nomeJogadorLocal then
+               mostrarErro("Não pode expulsar a si mesmo")
+            else
+               local nomeJogador = opcaoSelecionada:gsub(" - VOCÊ", "")
+               local sucesso, resultado = pcall(function()
+                  local argumentos = {nomeJogador}
+                  expulsaoAlvo:FireServer(unpack(argumentos))
+               end)
+               if sucesso then
+                  Rayfield:Notify({
+                     Title = "Jogador Expulso",
+                     Content = "Expulso: " .. nomeJogador,
+                     Duration = 3,
+                  })
+               else
+                  mostrarErro("Erro ao expulsar jogador: " .. tostring(resultado))
+               end
+            end
+         end
+         local sucesso, resultado = pcall(function()
+            ArmazenamentoReplicado:WaitForChild("GetPoints", 5):FireServer()
+         end)
+         if not sucesso then
+            mostrarErro("Erro ao chamar GetPoints: " .. tostring(resultado))
+         end
+      end,
+   })
+end)
+
+if not sucessoBotaoExpulsar then
+   mostrarErro("Falha ao criar Botão de Expulsão: " .. tostring(erroBotaoExpulsar))
+   return
+end
+
+-- Seção: Alterar Pontos
+Aba:CreateLabel("Alterar Pontos", 4483362458, Color3.fromRGB(255, 255, 255), false)
+Aba:CreateParagraph({
+   Title = "Seção de Alterar Pontos",
+   Content = "Defina pontos para os jogadores selecionados."
+})
+
+-- Entrada de Alteração de Pontos
+local EntradaPontos
+local sucessoEntradaPontos, erroEntradaPontos = pcall(function()
+   EntradaPontos = Aba:CreateInput({
+      Name = "Definir Pontos para Jogador(es) Selecionado(s)",
+      CurrentValue = "",
+      PlaceholderText = "Digite os pontos",
+      RemoveTextAfterFocusLost = false,
+      Flag = "EntradaPontos",
+      Callback = function(Texto)
+         local opcoesSelecionadas = DropdownSelecionarJogador.CurrentOption or {}
+         logDepuracao("Alterar Pontos - Jogadores selecionados: " .. (#opcoesSelecionadas > 0 and table.concat(opcoesSelecionadas, ", ") or "Nenhum"))
+         
+         if #opcoesSelecionadas == 0 then
+            mostrarErro("Nenhum jogador selecionado")
+            return
+         end
+
+         local pontos = tonumber(Texto)
+         if not pontos then
+            mostrarErro("Valor de pontos inválido inserido")
+            return
+         end
+
+         local alterarEstatistica = ArmazenamentoReplicado:WaitForChild("changestat", 5)
+         if not alterarEstatistica then
+            mostrarErro("Remoto changestat não encontrado")
+            return
+         end
+
+         for _, opcaoSelecionada in ipairs(opcoesSelecionadas) do
+            local nomeJogador = opcaoSelecionada:gsub(" - VOCÊ", "")
+            local sucesso, resultado = pcall(function()
+               local argumentos = {
+                  Jogadores:WaitForChild(nomeJogador, 5):WaitForChild("leaderstats", 5):WaitForChild("Points", 5),
+                  pontos
+               }
+               alterarEstatistica:FireServer(unpack(argumentos))
+            end)
+            if sucesso then
+               Rayfield:Notify({
+                  Title = "Pontos Alterados",
+                  Content = "Pontos alterados para " .. nomeJogador .. " para " .. pontos,
+                  Duration = 3,
+               })
+            else
+               mostrarErro("Erro ao alterar pontos: " .. tostring(resultado))
+            end
+         end
+      end,
+   })
+end)
+
+if not sucessoEntradaPontos then
+   mostrarErro("Falha ao criar Entrada de Pontos: " .. tostring(erroEntradaPontos))
+   return
+end
+
+-- Verificação Inicial da Lista de Jogadores
+logDepuracao("Verificação inicial da lista de jogadores")
+local listaInicialJogadores = atualizarListaJogadores()
+local sucessoInicial, resultadoInicial = pcall(function()
+   DropdownSelecionarJogador:Refresh(listaInicialJogadores)
+end)
+if not sucessoInicial then
+   mostrarErro("Erro ao inicializar lista de jogadores: " .. tostring(resultadoInicial))
+else
+   logDepuracao("Lista inicial de jogadores definida: " .. (#listaInicialJogadores > 0 and table.concat(listaInicialJogadores, ", ") or "Vazia"))
+end
